@@ -41,6 +41,9 @@ const RegistrationScreen = () => {
 
   const handleSubmit = () => {
     console.log({ login: login, email: email, password: password });
+    setLogin("");
+    setEmail("");
+    setPassword("");
   };
 
   const handleLoginLink = () => {
