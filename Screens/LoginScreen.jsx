@@ -1,5 +1,4 @@
 import React, { useState } from "react";
-import { Formik } from "formik";
 import { Dimensions } from "react-native";
 import {
   ImageBackground,
@@ -15,7 +14,7 @@ import {
 import { KeyboardAvoidingView } from "react-native";
 import bgImage from "../assets/img/photoBG.jpg";
 
-const LoginScreen = (props) => {
+const RegistrationScreen = () => {
   const [inputFocusState, setInputFocusState] = useState({
     email: false,
     password: false,
@@ -35,100 +34,97 @@ const LoginScreen = (props) => {
     }));
   };
 
-  const handleFormSubmit = (values, { resetForm }) => {
-    console.log(values);
-    resetForm();
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+
+  const handleSubmit = () => {
+    console.log({ email: email, password: password });
   };
 
-  const handleLoginLink = () => {
-    console.log("Open Login");
+  const handleRegisterLink = () => {
+    console.log("Open Register");
   };
 
   const handleViewPassword = () => {
     console.log("View Password");
   };
 
-  const initialValues = {
-    email: "",
-    password: "",
-  };
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-      <KeyboardAvoidingView
-        behavior={Platform.OS === "ios" ? "padding" : "height"}
-      >
-        <Formik initialValues={initialValues} onSubmit={handleFormSubmit}>
-          {({ values, handleChange, handleSubmit }) => (
-            <ImageBackground
-              source={bgImage}
-              style={styles.bgImage}
-              resizeMode="cover"
-            >
-              <View style={styles.formContainer}>
-                <Text style={styles.title}>Увійти</Text>
-                <View style={styles.inputContainer}>
-                  <TextInput
-                    style={
-                      inputFocusState.email
-                        ? styles.formInputFocus
-                        : styles.formInput
-                    }
-                    onFocus={() => handleInputOnFocus("email")}
-                    onBlur={() => handleInputOnBlur("email")}
-                    onChangeText={handleChange("email")}
-                    value={values.email}
-                    autoComplete="email"
-                    placeholder="Адреса електронної пошти"
-                  />
-                  <TextInput
-                    style={
-                      inputFocusState.password
-                        ? styles.formInputFocus
-                        : styles.formInput
-                    }
-                    onFocus={() => handleInputOnFocus("password")}
-                    onBlur={() => handleInputOnBlur("password")}
-                    secureTextEntry={true}
-                    onChangeText={handleChange("password")}
-                    value={values.password}
-                    placeholder="Пароль"
-                  />
-                  <TouchableOpacity onPress={handleViewPassword}>
-                    <Text style={styles.viewPassword}>Показати</Text>
-                  </TouchableOpacity>
-                </View>
-                <TouchableOpacity style={styles.formBtn} onPress={handleSubmit}>
-                  <Text style={styles.textBtn}>Увійти</Text>
+      <View style={styles.contentContainer}>
+        <KeyboardAvoidingView
+          behavior={Platform.OS == "ios" ? "padding" : "height"}
+          keyboardVerticalOffset={-230}
+        >
+          <ImageBackground
+            source={bgImage}
+            style={styles.bgImage}
+            resizeMode="cover"
+          >
+            <View style={styles.formContainer}>
+              <Text style={styles.title}>Увійти</Text>
+              <View style={styles.inputContainer}>
+                <TextInput
+                  style={
+                    inputFocusState.email
+                      ? styles.formInputFocus
+                      : styles.formInput
+                  }
+                  onFocus={() => handleInputOnFocus("email")}
+                  onBlur={() => handleInputOnBlur("email")}
+                  onChangeText={setEmail}
+                  value={email}
+                  autoComplete="email"
+                  placeholder="Адреса електронної пошти"
+                />
+                <TextInput
+                  style={
+                    inputFocusState.password
+                      ? styles.formInputFocus
+                      : styles.formInput
+                  }
+                  onFocus={() => handleInputOnFocus("password")}
+                  onBlur={() => handleInputOnBlur("password")}
+                  secureTextEntry={true}
+                  onChangeText={setPassword}
+                  value={password}
+                  placeholder="Пароль"
+                />
+                <TouchableOpacity onPress={handleViewPassword}>
+                  <Text style={styles.viewPassword}>Показати</Text>
                 </TouchableOpacity>
-                <TouchableOpacity onPress={handleLoginLink}>
-                  <Text style={styles.footerText}>
-                    Немає акаунту? Зареєструватися
-                  </Text>
-                </TouchableOpacity>
-                <View />
               </View>
-            </ImageBackground>
-          )}
-        </Formik>
-      </KeyboardAvoidingView>
+              <TouchableOpacity style={styles.formBtn} onPress={handleSubmit}>
+                <Text style={styles.textBtn}>Увійти</Text>
+              </TouchableOpacity>
+              <TouchableOpacity onPress={handleRegisterLink}>
+                <Text style={styles.footerText}>
+                  Немає акаунту?{" "}
+                  <Text style={styles.footerRegisterText}>Зареєструватися</Text>
+                </Text>
+              </TouchableOpacity>
+              <View />
+            </View>
+          </ImageBackground>
+        </KeyboardAvoidingView>
+      </View>
     </TouchableWithoutFeedback>
   );
 };
 
-export default LoginScreen;
+export default RegistrationScreen;
 
 const { width } = Dimensions.get("window");
 
 const styles = StyleSheet.create({
+  contentContainer: { flex: 1 },
   bgImage: {
     flex: 1,
-    justifyContent: "center",
+    justifyContent: "flex-end",
     alignItems: "center",
     width: width,
   },
   formContainer: {
-    position: "absolute",
-    bottom: 0,
     paddingTop: 32,
     paddingBottom: 111,
     paddingHorizontal: 16,
@@ -227,5 +223,8 @@ const styles = StyleSheet.create({
     width: 13,
     zIndex: 3,
     backgroundColor: "#FF6C00",
+  },
+  footerRegisterText: {
+    textDecorationLine: "underline",
   },
 });
