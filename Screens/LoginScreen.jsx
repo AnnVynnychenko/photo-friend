@@ -13,12 +13,18 @@ import {
 } from "react-native";
 import { KeyboardAvoidingView } from "react-native";
 import bgImage from "../assets/img/photoBG.jpg";
+import { useNavigation } from "@react-navigation/native";
 
 const RegistrationScreen = () => {
   const [inputFocusState, setInputFocusState] = useState({
     email: false,
     password: false,
   });
+  const [securePassword, setSecurePassword] = useState(true);
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+
+  const navigation = useNavigation();
 
   const handleInputOnFocus = (fieldName) => {
     setInputFocusState((prevState) => ({
@@ -34,21 +40,15 @@ const RegistrationScreen = () => {
     }));
   };
 
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-
   const handleSubmit = () => {
     console.log({ email: email, password: password });
+    setSecurePassword(true);
     setEmail("");
     setPassword("");
   };
 
-  const handleRegisterLink = () => {
-    console.log("Open Register");
-  };
-
   const handleViewPassword = () => {
-    console.log("View Password");
+    setSecurePassword((prevSecurePassword) => !prevSecurePassword);
   };
 
   return (
@@ -87,7 +87,7 @@ const RegistrationScreen = () => {
                   }
                   onFocus={() => handleInputOnFocus("password")}
                   onBlur={() => handleInputOnBlur("password")}
-                  secureTextEntry={true}
+                  secureTextEntry={securePassword}
                   onChangeText={setPassword}
                   value={password}
                   placeholder="Пароль"
@@ -99,12 +99,15 @@ const RegistrationScreen = () => {
               <TouchableOpacity style={styles.formBtn} onPress={handleSubmit}>
                 <Text style={styles.textBtn}>Увійти</Text>
               </TouchableOpacity>
-              <TouchableOpacity onPress={handleRegisterLink}>
-                <Text style={styles.footerText}>
-                  Немає акаунту?{" "}
+
+              <View style={styles.footerContainer}>
+                <Text style={styles.footerText}>Немає акаунту? </Text>
+                <TouchableOpacity
+                  onPress={() => navigation.navigate("Registration")}
+                >
                   <Text style={styles.footerRegisterText}>Зареєструватися</Text>
-                </Text>
-              </TouchableOpacity>
+                </TouchableOpacity>
+              </View>
               <View />
             </View>
           </ImageBackground>
@@ -119,7 +122,12 @@ export default RegistrationScreen;
 const { width } = Dimensions.get("window");
 
 const styles = StyleSheet.create({
-  contentContainer: { flex: 1 },
+  contentContainer: {
+    flex: 1,
+    backgroundColor: "#fff",
+    alignItems: "center",
+    fontFamily: "Roboto-Regular",
+  },
   bgImage: {
     flex: 1,
     justifyContent: "flex-end",
@@ -181,10 +189,20 @@ const styles = StyleSheet.create({
     marginBottom: 16,
   },
   textBtn: { fontSize: 16, color: "#fff" },
+  footerContainer: {
+    flexDirection: "row",
+    justifyContent: "center",
+  },
   footerText: {
     textAlign: "center",
     color: "#1B4371",
     fontSize: 16,
+  },
+  footerRegisterText: {
+    textAlign: "center",
+    color: "#1B4371",
+    fontSize: 16,
+    textDecorationLine: "underline",
   },
   avatar: {
     position: "absolute",
@@ -225,8 +243,5 @@ const styles = StyleSheet.create({
     width: 13,
     zIndex: 3,
     backgroundColor: "#FF6C00",
-  },
-  footerRegisterText: {
-    textDecorationLine: "underline",
   },
 });

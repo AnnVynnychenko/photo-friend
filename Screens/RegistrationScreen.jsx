@@ -13,6 +13,7 @@ import {
 } from "react-native";
 import { KeyboardAvoidingView } from "react-native";
 import bgImage from "../assets/img/photoBG.jpg";
+import { useNavigation } from "@react-navigation/native";
 
 const RegistrationScreen = () => {
   const [inputFocusState, setInputFocusState] = useState({
@@ -20,6 +21,11 @@ const RegistrationScreen = () => {
     email: false,
     password: false,
   });
+
+  const [securePassword, setSecurePassword] = useState(true);
+  const [login, setLogin] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
 
   const handleInputOnFocus = (fieldName) => {
     setInputFocusState((prevState) => ({
@@ -35,23 +41,18 @@ const RegistrationScreen = () => {
     }));
   };
 
-  const [login, setLogin] = useState("");
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+  const navigation = useNavigation();
 
   const handleSubmit = () => {
     console.log({ login: login, email: email, password: password });
+    setSecurePassword(true);
     setLogin("");
     setEmail("");
     setPassword("");
   };
 
-  const handleLoginLink = () => {
-    console.log("Open Login");
-  };
-
   const handleViewPassword = () => {
-    console.log("View Password");
+    setSecurePassword((prevSecurePassword) => !prevSecurePassword);
   };
 
   return (
@@ -59,7 +60,7 @@ const RegistrationScreen = () => {
       <View style={styles.contentContainer}>
         <KeyboardAvoidingView
           behavior={Platform.OS == "ios" ? "padding" : "height"}
-          keyboardVerticalOffset={-170}
+          keyboardVerticalOffset={-200}
         >
           <ImageBackground
             source={bgImage}
@@ -111,7 +112,7 @@ const RegistrationScreen = () => {
                   }
                   onFocus={() => handleInputOnFocus("password")}
                   onBlur={() => handleInputOnBlur("password")}
-                  secureTextEntry={true}
+                  secureTextEntry={securePassword}
                   onChangeText={setPassword}
                   value={password}
                   placeholder="Пароль"
@@ -123,9 +124,13 @@ const RegistrationScreen = () => {
               <TouchableOpacity style={styles.formBtn} onPress={handleSubmit}>
                 <Text style={styles.textBtn}>Зареєструватися</Text>
               </TouchableOpacity>
-              <TouchableOpacity onPress={handleLoginLink}>
-                <Text style={styles.footerText}> Вже є акаунт? Увійти</Text>
-              </TouchableOpacity>
+
+              <View style={styles.footerContainer}>
+                <Text style={styles.footerText}> Вже є акаунт? </Text>
+                <TouchableOpacity onPress={() => navigation.navigate("Login")}>
+                  <Text style={styles.footerText}>Увійти</Text>
+                </TouchableOpacity>
+              </View>
               <View />
             </View>
           </ImageBackground>
@@ -140,7 +145,12 @@ export default RegistrationScreen;
 const { width } = Dimensions.get("window");
 
 const styles = StyleSheet.create({
-  contentContainer: { flex: 1 },
+  contentContainer: {
+    flex: 1,
+    backgroundColor: "#fff",
+    alignItems: "center",
+    fontFamily: "Roboto-Regular",
+  },
   bgImage: {
     flex: 1,
     justifyContent: "flex-end",
@@ -166,6 +176,7 @@ const styles = StyleSheet.create({
     height: 50,
     width: 343,
     paddingHorizontal: 16,
+    fontFamily: "Roboto-Regular",
     fontSize: 16,
     backgroundColor: "#f6f6f6",
     borderColor: "#e8e8e8",
@@ -176,6 +187,7 @@ const styles = StyleSheet.create({
     height: 50,
     width: 343,
     paddingHorizontal: 16,
+    fontFamily: "Roboto-Regular",
     fontSize: 16,
     borderColor: "#FF6C00",
     backgroundColor: "#fff",
@@ -191,6 +203,7 @@ const styles = StyleSheet.create({
     bottom: 30,
     left: 255,
     color: "#1B4371",
+    fontFamily: "Roboto-Regular",
     fontSize: 16,
   },
   formBtn: {
@@ -201,9 +214,13 @@ const styles = StyleSheet.create({
     borderRadius: 100,
     marginBottom: 16,
   },
-  textBtn: { fontSize: 16, color: "#fff" },
+  textBtn: { fontFamily: "Roboto-Regular", fontSize: 16, color: "#fff" },
+  footerContainer: {
+    flexDirection: "row",
+    justifyContent: "center",
+  },
   footerText: {
-    textAlign: "center",
+    fontFamily: "Roboto-Regular",
     color: "#1B4371",
     fontSize: 16,
   },
