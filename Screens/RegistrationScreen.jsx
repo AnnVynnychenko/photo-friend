@@ -26,6 +26,7 @@ const RegistrationScreen = () => {
   const [login, setLogin] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  // const [avatarImg, setAvatarImg] = useState(null);
 
   const handleInputOnFocus = (fieldName) => {
     setInputFocusState((prevState) => ({
@@ -44,16 +45,18 @@ const RegistrationScreen = () => {
   const navigation = useNavigation();
 
   const handleSubmit = () => {
-    console.log({ login: login, email: email, password: password });
     setSecurePassword(true);
     setLogin("");
     setEmail("");
     setPassword("");
+    navigation.navigate("Home", { screen: "Posts", params: { login, email } });
   };
 
   const handleViewPassword = () => {
     setSecurePassword((prevSecurePassword) => !prevSecurePassword);
   };
+
+  const handleAddAvatar = () => {};
 
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
@@ -70,7 +73,7 @@ const RegistrationScreen = () => {
             <View style={styles.formContainer}>
               <View style={styles.avatar}>
                 {/* <Image /> */}
-                <TouchableOpacity>
+                <TouchableOpacity onPress={handleAddAvatar}>
                   <View style={styles.addAvatarBtnCircle}>
                     <View style={styles.addAvatarBtnVerticalLine} />
                     <View style={styles.addAvatarBtnHorizontalLine} />
