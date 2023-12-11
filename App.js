@@ -5,9 +5,9 @@ import LoginScreen from "./Screens/LoginScreen";
 import { useFonts } from "expo-font";
 import { NavigationContainer } from "@react-navigation/native";
 import { createStackNavigator } from "@react-navigation/stack";
-import HeaderPostsScreen from "./Screens/PostsScreen/HeaderPostsScreen";
+
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
-import Home from "./Screens/Home";
+import HomeScreen from "./Screens/HomeScreen";
 
 const MainStack = createStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -24,30 +24,10 @@ export default function App() {
   }
   return (
     <NavigationContainer>
-      <MainStack.Navigator>
-        <MainStack.Screen
-          name="Registration"
-          component={RegistrationScreen}
-          options={{ headerShown: false }}
-        />
-        <MainStack.Screen
-          name="Login"
-          component={LoginScreen}
-          options={{ headerShown: false }}
-        />
-        <MainStack.Screen
-          name="Home"
-          component={Home}
-          options={{
-            headerTitle: (props) => <HeaderPostsScreen {...props} />,
-            headerStyle: {
-              backgroundColor: "#fff",
-              borderBottomColor: "rgba(0, 0, 0, 0.3)",
-              borderBottomWidth: 1,
-            },
-            headerLeft: null,
-          }}
-        />
+      <MainStack.Navigator screenOptions={{ headerShown: false }}>
+        <MainStack.Screen name="Registration" component={RegistrationScreen} />
+        <MainStack.Screen name="Login" component={LoginScreen} />
+        <MainStack.Screen name="Home" component={HomeScreen} />
       </MainStack.Navigator>
       <StatusBar style="auto" />
     </NavigationContainer>
