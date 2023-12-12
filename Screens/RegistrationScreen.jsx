@@ -28,6 +28,8 @@ const RegistrationScreen = () => {
   const [password, setPassword] = useState("");
   const [avatarImg, setAvatarImg] = useState(null);
 
+  const navigation = useNavigation();
+
   const handleAddAvatar = async () => {
     try {
       const result = await ImagePicker.launchImageLibraryAsync({
@@ -66,14 +68,13 @@ const RegistrationScreen = () => {
     }));
   };
 
-  const navigation = useNavigation();
-
   const handleSubmit = () => {
     setSecurePassword(true);
     setLogin("");
     setEmail("");
     setPassword("");
     setAvatarImg(null);
+
     navigation.navigate("Home", {
       screen: "Posts",
       params: { login, email, avatarImg },

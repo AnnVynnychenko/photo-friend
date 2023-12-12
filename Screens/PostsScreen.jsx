@@ -3,7 +3,7 @@ import { View, StyleSheet, Text, Image } from "react-native";
 
 const PostsScreen = () => {
   const {
-    params: { email, login, avatarImg },
+    params: { email, login, avatarImg, photoName, location },
   } = useRoute();
   return (
     <View style={styles.contentContainer}>
@@ -16,6 +16,8 @@ const PostsScreen = () => {
           <Text style={styles.email}>{email}</Text>
         </View>
       </View>
+      <View style={styles.photoContainer}>{/* <Image/> */}</View>
+      <Text style={styles.downloadText}>{photoName}</Text>
     </View>
   );
 };
@@ -32,6 +34,7 @@ const styles = StyleSheet.create({
   userContainer: {
     flexDirection: "row",
     gap: 8,
+    marginBottom: 32,
   },
   avatar: {
     width: 60,
@@ -56,5 +59,16 @@ const styles = StyleSheet.create({
     width: 60,
     height: 60,
     borderRadius: 16,
+  },
+  photoContainer: {
+    width: 343,
+    height: 240,
+    alignItems: "center",
+    justifyContent: "center",
+    marginBottom: 8,
+    backgroundColor: "#F6F6F6",
+    borderWidth: 1,
+    borderRadius: 8,
+    borderColor: "#E8E8E8",
   },
 });

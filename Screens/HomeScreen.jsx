@@ -103,6 +103,18 @@ const HomeScreen = ({ navigation }) => {
               />
             </TouchableOpacity>
           ),
+          headerRight: () => (
+            <Text
+              style={{
+                marginRight: 102,
+                fontFamily: "Roboto-Medium",
+                fontSize: 17,
+                color: "#212121",
+              }}
+            >
+              Створити публікацію
+            </Text>
+          ),
         }}
       />
       <HomeTab.Screen

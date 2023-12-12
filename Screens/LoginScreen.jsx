@@ -45,6 +45,7 @@ const RegistrationScreen = () => {
     setSecurePassword(true);
     setEmail("");
     setPassword("");
+
     navigation.navigate("Home", { screen: "Posts", params: { email } });
   };
 
