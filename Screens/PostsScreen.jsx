@@ -1,14 +1,16 @@
 import { useRoute } from "@react-navigation/native";
-import { View, StyleSheet, Text } from "react-native";
+import { View, StyleSheet, Text, Image } from "react-native";
 
 const PostsScreen = () => {
   const {
-    params: { email, login },
+    params: { email, login, avatarImg },
   } = useRoute();
   return (
     <View style={styles.contentContainer}>
       <View style={styles.userContainer}>
-        <View style={styles.avatar}></View>
+        <View style={styles.avatar}>
+          <Image source={{ uri: avatarImg }} style={styles.avatarImg} />
+        </View>
         <View style={styles.userText}>
           <Text style={styles.login}>{login}</Text>
           <Text style={styles.email}>{email}</Text>
@@ -49,5 +51,10 @@ const styles = StyleSheet.create({
     fontFamily: "Roboto-Bold",
     fontSize: 13,
     color: "#212121",
+  },
+  avatarImg: {
+    width: 60,
+    height: 60,
+    borderRadius: 16,
   },
 });

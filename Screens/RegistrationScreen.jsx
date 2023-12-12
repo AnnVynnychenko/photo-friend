@@ -14,6 +14,7 @@ import {
 import { KeyboardAvoidingView } from "react-native";
 import bgImage from "../assets/img/photoBG.jpg";
 import { useNavigation } from "@react-navigation/native";
+import * as ImagePicker from "expo-image-picker";
 
 const RegistrationScreen = () => {
   const [inputFocusState, setInputFocusState] = useState({
@@ -21,12 +22,35 @@ const RegistrationScreen = () => {
     email: false,
     password: false,
   });
-
   const [securePassword, setSecurePassword] = useState(true);
   const [login, setLogin] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  // const [avatarImg, setAvatarImg] = useState(null);
+  const [avatarImg, setAvatarImg] = useState(null);
+
+  const handleAddAvatar = async () => {
+    try {
+      const result = await ImagePicker.launchImageLibraryAsync({
+        mediaTypes: ImagePicker.MediaTypeOptions.Images,
+        allowsEditing: true,
+        aspect: [1, 1],
+        quality: 1,
+      });
+
+      if (!result.canceled) {
+        const selectedImage = result.assets[0];
+        setAvatarImg(selectedImage.uri);
+      }
+    } catch (error) {
+      console.error("Error picking image:", error);
+    }
+  };
+
+  const handleDeleteAvatar = () => {
+    if (avatarImg) {
+      setAvatarImg(null);
+    }
+  };
 
   const handleInputOnFocus = (fieldName) => {
     setInputFocusState((prevState) => ({
@@ -49,14 +73,16 @@ const RegistrationScreen = () => {
     setLogin("");
     setEmail("");
     setPassword("");
-    navigation.navigate("Home", { screen: "Posts", params: { login, email } });
+    setAvatarImg(null);
+    navigation.navigate("Home", {
+      screen: "Posts",
+      params: { login, email, avatarImg },
+    });
   };
 
   const handleViewPassword = () => {
     setSecurePassword((prevSecurePassword) => !prevSecurePassword);
   };
-
-  const handleAddAvatar = () => {};
 
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
@@ -72,13 +98,27 @@ const RegistrationScreen = () => {
           >
             <View style={styles.formContainer}>
               <View style={styles.avatar}>
-                {/* <Image /> */}
-                <TouchableOpacity onPress={handleAddAvatar}>
-                  <View style={styles.addAvatarBtnCircle}>
-                    <View style={styles.addAvatarBtnVerticalLine} />
-                    <View style={styles.addAvatarBtnHorizontalLine} />
+                {avatarImg ? (
+                  <View>
+                    <Image
+                      source={{ uri: avatarImg }}
+                      style={styles.avatarImg}
+                    />
+                    <TouchableOpacity onPress={handleDeleteAvatar}>
+                      <View style={styles.deleteAvatarBtnCircle}>
+                        <View style={styles.deleteAvatarBtnVerticalLine} />
+                        <View style={styles.deleteAvatarBtnHorizontalLine} />
+                      </View>
+                    </TouchableOpacity>
                   </View>
-                </TouchableOpacity>
+                ) : (
+                  <TouchableOpacity onPress={handleAddAvatar}>
+                    <View style={styles.addAvatarBtnCircle}>
+                      <View style={styles.addAvatarBtnVerticalLine} />
+                      <View style={styles.addAvatarBtnHorizontalLine} />
+                    </View>
+                  </TouchableOpacity>
+                )}
               </View>
               <Text style={styles.title}>Реєстрація</Text>
               <View style={styles.inputContainer}>
@@ -243,7 +283,6 @@ const styles = StyleSheet.create({
     top: 75,
     width: 25,
     height: 25,
-    zIndex: 2,
     backgroundColor: "#fff",
     borderRadius: 100,
     borderColor: "#FF6C00",
@@ -255,7 +294,6 @@ const styles = StyleSheet.create({
     left: 11,
     width: 1,
     height: 13,
-    zIndex: 3,
     backgroundColor: "#FF6C00",
   },
   addAvatarBtnHorizontalLine: {
@@ -264,7 +302,40 @@ const styles = StyleSheet.create({
     left: 5,
     height: 1,
     width: 13,
-    zIndex: 3,
     backgroundColor: "#FF6C00",
+  },
+  avatarImg: {
+    width: 120,
+    height: 120,
+    borderRadius: 16,
+  },
+  deleteAvatarBtnCircle: {
+    position: "absolute",
+    left: 108,
+    bottom: 25,
+    width: 25,
+    height: 25,
+    backgroundColor: "#fff",
+    borderRadius: 100,
+    borderColor: "#BDBDBD",
+    borderWidth: 1,
+  },
+  deleteAvatarBtnVerticalLine: {
+    position: "absolute",
+    top: 5,
+    left: 11,
+    width: 1,
+    height: 13,
+    transform: [{ rotate: "135deg" }],
+    backgroundColor: "#BDBDBD",
+  },
+  deleteAvatarBtnHorizontalLine: {
+    position: "absolute",
+    top: 11,
+    left: 5,
+    height: 1,
+    width: 13,
+    transform: [{ rotate: "135deg" }],
+    backgroundColor: "#BDBDBD",
   },
 });
