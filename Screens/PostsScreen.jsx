@@ -1,5 +1,7 @@
 import { useRoute } from "@react-navigation/native";
-import { View, StyleSheet, Text, Image } from "react-native";
+import { View, StyleSheet, Text, Image, TouchableOpacity } from "react-native";
+import Feather from "react-native-vector-icons/Feather";
+import { SimpleLineIcons } from "@expo/vector-icons";
 
 const PostsScreen = () => {
   const {
@@ -16,8 +18,27 @@ const PostsScreen = () => {
           <Text style={styles.email}>{email}</Text>
         </View>
       </View>
-      <View style={styles.photoContainer}>{/* <Image/> */}</View>
-      <Text style={styles.downloadText}>{photoName}</Text>
+      <View style={styles.postContainer}>
+        <View style={styles.photoContainer}>{/* <Image/> */}</View>
+        <Text style={styles.photoName}>{photoName}</Text>
+        <View style={styles.additionalInfoContainer}>
+          <View style={styles.commentContainer}>
+            <TouchableOpacity>
+              <Feather
+                name="message-circle"
+                size={24}
+                color="#BDBDBD"
+                style={styles.commentIcon}
+              />
+            </TouchableOpacity>
+            <Text style={styles.commentQuantity}>0</Text>
+          </View>
+          <View style={styles.locationContainer}>
+            <SimpleLineIcons name="location-pin" size={24} color="#BDBDBD" />
+            <Text style={styles.locationText}>{location}</Text>
+          </View>
+        </View>
+      </View>
     </View>
   );
 };
@@ -60,6 +81,9 @@ const styles = StyleSheet.create({
     height: 60,
     borderRadius: 16,
   },
+  postContainer: {
+    marginBottom: 32,
+  },
   photoContainer: {
     width: 343,
     height: 240,
@@ -70,5 +94,34 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderRadius: 8,
     borderColor: "#E8E8E8",
+  },
+  photoName: {
+    marginBottom: 8,
+    fontFamily: "Roboto-Medium",
+    fontSize: 16,
+    color: "#212121",
+  },
+  additionalInfoContainer: {
+    flexDirection: "row",
+    gap: 49,
+  },
+  commentIcon: { transform: [{ rotate: "270deg" }] },
+  commentQuantity: {
+    fontSize: 16,
+    color: "#BDBDBD",
+  },
+  commentContainer: {
+    flexDirection: "row",
+    gap: 3,
+  },
+  locationContainer: {
+    width: 255,
+    flexDirection: "row",
+    gap: 3,
+  },
+  locationText: {
+    fontSize: 16,
+    color: "#212121",
+    textDecorationLine: "underline",
   },
 });
