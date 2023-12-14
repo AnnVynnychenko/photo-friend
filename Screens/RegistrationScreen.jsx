@@ -186,8 +186,6 @@ const RegistrationScreen = () => {
 
 export default RegistrationScreen;
 
-const { width } = Dimensions.get("window");
-
 const styles = StyleSheet.create({
   contentContainer: {
     flex: 1,
@@ -199,7 +197,7 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "flex-end",
     alignItems: "center",
-    width: width,
+    width: Dimensions.get("window").width,
   },
   formContainer: {
     paddingTop: 92,

@@ -14,17 +14,17 @@ import { useEffect, useState } from "react";
 import { useNavigation } from "@react-navigation/native";
 import { Camera } from "expo-camera";
 import * as MediaLibrary from "expo-media-library";
+import MapView, { Marker } from "react-native-maps";
+import * as Location from "expo-location";
 
 const CreatePostsScreen = () => {
   const [photoName, setPhotoName] = useState("");
-  console.log("photoName", photoName);
-  const [location, setLocation] = useState("");
-  console.log("location", location);
+  const [location, setLocation] = useState({});
+  const [userLocation, setUserLocation] = useState("");
   const [hasPermission, setHasPermission] = useState(null);
   const [cameraRef, setCameraRef] = useState(null);
   const [takePhoto, setTakePhoto] = useState(false);
   const [capturedImage, setCapturedImage] = useState(null);
-  console.log("capturedImage", capturedImage);
   const [posts, setPosts] = useState([]);
 
   const navigation = useNavigation();
@@ -36,6 +36,19 @@ const CreatePostsScreen = () => {
 
       setHasPermission(status === "granted");
     })();
+    (async () => {
+      let { status } = await Location.requestForegroundPermissionsAsync();
+      if (status !== "granted") {
+        console.log("Permission to access location was denied");
+      }
+
+      let location = await Location.getCurrentPositionAsync({});
+      const coords = {
+        latitude: location.coords.latitude,
+        longitude: location.coords.longitude,
+      };
+      setLocation(coords);
+    })();
   }, []);
 
   if (hasPermission === null) {
@@ -46,14 +59,15 @@ const CreatePostsScreen = () => {
   }
 
   const handlePublish = () => {
-    const newPost = { photoName, location, capturedImage };
+    const newPost = { photoName, location, capturedImage, userLocation };
     setPosts(posts.concat(newPost));
     navigation.navigate("Home", {
       screen: "Posts",
       params: { posts: posts.concat(newPost) },
     });
     setPhotoName("");
-    setLocation("");
+    setLocation({});
+    setUserLocation("");
     setCapturedImage(null);
     setTakePhoto(false);
   };
@@ -123,8 +137,8 @@ const CreatePostsScreen = () => {
           />
           <TextInput
             style={styles.photoLocation}
-            onChangeText={setLocation}
-            value={location}
+            onChangeText={setUserLocation}
+            value={userLocation}
             placeholder="Місцевість..."
             placeholderTextColor="#BDBDBD"
           />

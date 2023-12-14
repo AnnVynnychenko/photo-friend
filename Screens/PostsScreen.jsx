@@ -1,4 +1,4 @@
-import { useRoute } from "@react-navigation/native";
+import { useNavigation, useRoute } from "@react-navigation/native";
 import {
   View,
   StyleSheet,
@@ -12,18 +12,20 @@ import { SimpleLineIcons } from "@expo/vector-icons";
 import uuid from "react-native-uuid";
 
 const PostsScreen = () => {
+  const navigation = useNavigation();
   const { params } = useRoute();
-  const { posts } = params;
+  const { posts, avatarImg, login, email } = params;
+  console.log("posts", posts);
 
   return (
     <View style={styles.contentContainer}>
       <View style={styles.userContainer}>
         <View style={styles.avatar}>
-          <Image source={{ uri: params.avatarImg }} style={styles.avatarImg} />
+          <Image source={{ uri: avatarImg }} style={styles.avatarImg} />
         </View>
         <View style={styles.userText}>
-          <Text style={styles.login}>{params.login}</Text>
-          <Text style={styles.email}>{params.email}</Text>
+          <Text style={styles.login}>{login}</Text>
+          <Text style={styles.email}>{email}</Text>
         </View>
       </View>
       <FlatList
@@ -51,50 +53,31 @@ const PostsScreen = () => {
                 <Text style={styles.commentQuantity}>0</Text>
               </View>
               <View style={styles.locationContainer}>
-                <SimpleLineIcons
-                  name="location-pin"
-                  size={24}
-                  color="#BDBDBD"
-                />
-                <Text style={styles.locationText}>{post.location}</Text>
+                {post.location ? (
+                  <TouchableOpacity
+                    onPress={() =>
+                      navigation.navigate("Map", { location: post.location })
+                    }
+                  >
+                    <SimpleLineIcons
+                      name="location-pin"
+                      size={24}
+                      color="#FF6C00"
+                    />
+                  </TouchableOpacity>
+                ) : (
+                  <SimpleLineIcons
+                    name="location-pin"
+                    size={24}
+                    color="#BDBDBD"
+                  />
+                )}
+                <Text style={styles.locationText}>{post.userLocation}</Text>
               </View>
             </View>
           </View>
         )}
       />
-      {/* {posts &&
-        posts.map((post) => (
-          <View key={uuid.v4()} style={styles.postContainer}>
-            <View style={styles.photoContainer}>
-              <Image
-                source={{ uri: post.capturedImage }}
-                style={styles.capturedImage}
-              />
-            </View>
-            <Text style={styles.photoName}>{post.photoName}</Text>
-            <View style={styles.additionalInfoContainer}>
-              <View style={styles.commentContainer}>
-                <TouchableOpacity>
-                  <Feather
-                    name="message-circle"
-                    size={24}
-                    color="#BDBDBD"
-                    style={styles.commentIcon}
-                  />
-                </TouchableOpacity>
-                <Text style={styles.commentQuantity}>0</Text>
-              </View>
-              <View style={styles.locationContainer}>
-                <SimpleLineIcons
-                  name="location-pin"
-                  size={24}
-                  color="#BDBDBD"
-                />
-                <Text style={styles.locationText}>{post.location}</Text>
-              </View>
-            </View>
-          </View>
-        ))} */}
     </View>
   );
 };

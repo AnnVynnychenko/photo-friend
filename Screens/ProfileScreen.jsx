@@ -12,9 +12,13 @@ import bgImage from "../assets/img/photoBG.jpg";
 import * as ImagePicker from "expo-image-picker";
 import Feather from "react-native-vector-icons/Feather";
 import { SimpleLineIcons } from "@expo/vector-icons";
+import { useRoute } from "@react-navigation/native";
 
 const ProfileScreen = () => {
   const [avatarImg, setAvatarImg] = useState(null);
+
+  const { params } = useRoute();
+  const { login } = params;
 
   const handleAddAvatar = async () => {
     try {
@@ -68,7 +72,7 @@ const ProfileScreen = () => {
               </TouchableOpacity>
             )}
           </View>
-          <Text style={styles.title}>Login</Text>
+          <Text style={styles.title}>{login}</Text>
           <View style={styles.postContainer}>
             <View style={styles.photoContainer}>{/* <Image/> */}</View>
             <Text style={styles.photoName}></Text>

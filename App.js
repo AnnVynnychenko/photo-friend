@@ -6,6 +6,7 @@ import { useFonts } from "expo-font";
 import { NavigationContainer } from "@react-navigation/native";
 import { createStackNavigator } from "@react-navigation/stack";
 import HomeScreen from "./Screens/HomeScreen";
+import MapScreen from "./Screens/MapScreen";
 
 const MainStack = createStackNavigator();
 
@@ -25,6 +26,7 @@ export default function App() {
         <MainStack.Screen name="Registration" component={RegistrationScreen} />
         <MainStack.Screen name="Login" component={LoginScreen} />
         <MainStack.Screen name="Home" component={HomeScreen} />
+        <MainStack.Screen name="Map" component={MapScreen} />
       </MainStack.Navigator>
       <StatusBar style="auto" />
     </NavigationContainer>
