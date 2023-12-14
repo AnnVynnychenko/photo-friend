@@ -1,44 +1,100 @@
 import { useRoute } from "@react-navigation/native";
-import { View, StyleSheet, Text, Image, TouchableOpacity } from "react-native";
+import {
+  View,
+  StyleSheet,
+  Text,
+  Image,
+  TouchableOpacity,
+  FlatList,
+} from "react-native";
 import Feather from "react-native-vector-icons/Feather";
 import { SimpleLineIcons } from "@expo/vector-icons";
+import uuid from "react-native-uuid";
 
 const PostsScreen = () => {
-  const {
-    params: { email, login, avatarImg, photoName, location },
-  } = useRoute();
+  const { params } = useRoute();
+  const { posts } = params;
+
   return (
     <View style={styles.contentContainer}>
       <View style={styles.userContainer}>
         <View style={styles.avatar}>
-          <Image source={{ uri: avatarImg }} style={styles.avatarImg} />
+          <Image source={{ uri: params.avatarImg }} style={styles.avatarImg} />
         </View>
         <View style={styles.userText}>
-          <Text style={styles.login}>{login}</Text>
-          <Text style={styles.email}>{email}</Text>
+          <Text style={styles.login}>{params.login}</Text>
+          <Text style={styles.email}>{params.email}</Text>
         </View>
       </View>
-      <View style={styles.postContainer}>
-        <View style={styles.photoContainer}>{/* <Image/> */}</View>
-        <Text style={styles.photoName}>{photoName}</Text>
-        <View style={styles.additionalInfoContainer}>
-          <View style={styles.commentContainer}>
-            <TouchableOpacity>
-              <Feather
-                name="message-circle"
-                size={24}
-                color="#BDBDBD"
-                style={styles.commentIcon}
+      <FlatList
+        data={posts}
+        keyExtractor={() => uuid.v4()}
+        renderItem={({ item: post }) => (
+          <View style={styles.postContainer}>
+            <View style={styles.photoContainer}>
+              <Image
+                source={{ uri: post.capturedImage }}
+                style={styles.capturedImage}
               />
-            </TouchableOpacity>
-            <Text style={styles.commentQuantity}>0</Text>
+            </View>
+            <Text style={styles.photoName}>{post.photoName}</Text>
+            <View style={styles.additionalInfoContainer}>
+              <View style={styles.commentContainer}>
+                <TouchableOpacity>
+                  <Feather
+                    name="message-circle"
+                    size={24}
+                    color="#BDBDBD"
+                    style={styles.commentIcon}
+                  />
+                </TouchableOpacity>
+                <Text style={styles.commentQuantity}>0</Text>
+              </View>
+              <View style={styles.locationContainer}>
+                <SimpleLineIcons
+                  name="location-pin"
+                  size={24}
+                  color="#BDBDBD"
+                />
+                <Text style={styles.locationText}>{post.location}</Text>
+              </View>
+            </View>
           </View>
-          <View style={styles.locationContainer}>
-            <SimpleLineIcons name="location-pin" size={24} color="#BDBDBD" />
-            <Text style={styles.locationText}>{location}</Text>
+        )}
+      />
+      {/* {posts &&
+        posts.map((post) => (
+          <View key={uuid.v4()} style={styles.postContainer}>
+            <View style={styles.photoContainer}>
+              <Image
+                source={{ uri: post.capturedImage }}
+                style={styles.capturedImage}
+              />
+            </View>
+            <Text style={styles.photoName}>{post.photoName}</Text>
+            <View style={styles.additionalInfoContainer}>
+              <View style={styles.commentContainer}>
+                <TouchableOpacity>
+                  <Feather
+                    name="message-circle"
+                    size={24}
+                    color="#BDBDBD"
+                    style={styles.commentIcon}
+                  />
+                </TouchableOpacity>
+                <Text style={styles.commentQuantity}>0</Text>
+              </View>
+              <View style={styles.locationContainer}>
+                <SimpleLineIcons
+                  name="location-pin"
+                  size={24}
+                  color="#BDBDBD"
+                />
+                <Text style={styles.locationText}>{post.location}</Text>
+              </View>
+            </View>
           </View>
-        </View>
-      </View>
+        ))} */}
     </View>
   );
 };
@@ -87,8 +143,6 @@ const styles = StyleSheet.create({
   photoContainer: {
     width: 343,
     height: 240,
-    alignItems: "center",
-    justifyContent: "center",
     marginBottom: 8,
     backgroundColor: "#F6F6F6",
     borderWidth: 1,
@@ -123,5 +177,9 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: "#212121",
     textDecorationLine: "underline",
+  },
+  capturedImage: {
+    flex: 1,
+    borderRadius: 8,
   },
 });

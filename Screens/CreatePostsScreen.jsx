@@ -1,67 +1,155 @@
 import {
   Image,
+  Keyboard,
   StyleSheet,
   Text,
   TextInput,
   TouchableOpacity,
+  TouchableWithoutFeedback,
   View,
 } from "react-native";
 import { FontAwesome5, SimpleLineIcons } from "@expo/vector-icons";
 import Feather from "react-native-vector-icons/Feather";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigation } from "@react-navigation/native";
+import { Camera } from "expo-camera";
+import * as MediaLibrary from "expo-media-library";
 
 const CreatePostsScreen = () => {
   const [photoName, setPhotoName] = useState("");
+  console.log("photoName", photoName);
   const [location, setLocation] = useState("");
+  console.log("location", location);
+  const [hasPermission, setHasPermission] = useState(null);
+  const [cameraRef, setCameraRef] = useState(null);
+  const [takePhoto, setTakePhoto] = useState(false);
+  const [capturedImage, setCapturedImage] = useState(null);
+  console.log("capturedImage", capturedImage);
+  const [posts, setPosts] = useState([]);
 
   const navigation = useNavigation();
 
+  useEffect(() => {
+    (async () => {
+      const { status } = await Camera.requestCameraPermissionsAsync();
+      await MediaLibrary.requestPermissionsAsync();
+
+      setHasPermission(status === "granted");
+    })();
+  }, []);
+
+  if (hasPermission === null) {
+    return <View />;
+  }
+  if (hasPermission === false) {
+    return <Text>No access to camera</Text>;
+  }
+
   const handlePublish = () => {
+    const newPost = { photoName, location, capturedImage };
+    setPosts(posts.concat(newPost));
     navigation.navigate("Home", {
       screen: "Posts",
-      params: { photoName, location },
+      params: { posts: posts.concat(newPost) },
     });
+    setPhotoName("");
+    setLocation("");
+    setCapturedImage(null);
+    setTakePhoto(false);
   };
 
   return (
-    <View style={styles.contentContainer}>
-      <View style={styles.photoContainer}>
-        <TouchableOpacity>
-          <View style={styles.iconCircle}>
-            <FontAwesome5 name="camera" size={24} color="#BDBDBD" />
+    <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+      <View style={styles.contentContainer}>
+        {!takePhoto ? (
+          <View style={styles.cameraContainer}>
+            <Camera
+              style={styles.camera}
+              type={Camera.Constants.Type.back}
+              ref={setCameraRef}
+            >
+              <View style={styles.photoView}>
+                <TouchableOpacity
+                  style={styles.iconCircle}
+                  onPress={async () => {
+                    if (cameraRef) {
+                      const { uri } = await cameraRef.takePictureAsync();
+                      await MediaLibrary.createAssetAsync(uri);
+                      setCapturedImage(uri);
+                      setTakePhoto(true);
+                    }
+                  }}
+                >
+                  <FontAwesome5 name="camera" size={24} color="#BDBDBD" />
+                </TouchableOpacity>
+              </View>
+            </Camera>
+            <Text style={styles.downloadText}>Завантажте фото</Text>
           </View>
-        </TouchableOpacity>
-        {/* <Image/> */}
-      </View>
-      <Text style={styles.downloadText}>Завантажте фото</Text>
-      <TextInput
-        style={styles.photoName}
-        onChangeText={setPhotoName}
-        placeholder="Назва..."
-        placeholderTextColor="#BDBDBD"
-      />
-      <View style={styles.locationContainer}>
-        <SimpleLineIcons
-          name="location-pin"
-          size={24}
-          color="#BDBDBD"
-          style={styles.locationPin}
-        />
+        ) : (
+          <View>
+            <View style={styles.photoContainer}>
+              <Image
+                source={{ uri: capturedImage }}
+                style={styles.capturedImage}
+              />
+              <TouchableOpacity
+                style={[styles.iconCircle, styles.iconCircleTransp]}
+                onPress={async () => {
+                  setCapturedImage(null);
+                  setTakePhoto(false);
+                }}
+              >
+                <FontAwesome5 name="camera" size={24} color="#fff" />
+              </TouchableOpacity>
+            </View>
+            <Text style={styles.downloadText}>Редагувати фото</Text>
+          </View>
+        )}
+
         <TextInput
-          style={styles.photoLocation}
-          onChangeText={setLocation}
-          placeholder="Місцевість..."
+          style={styles.photoName}
+          onChangeText={setPhotoName}
+          value={photoName}
+          placeholder="Назва..."
           placeholderTextColor="#BDBDBD"
         />
+        <View style={styles.locationContainer}>
+          <SimpleLineIcons
+            name="location-pin"
+            size={24}
+            color="#BDBDBD"
+            style={styles.locationPin}
+          />
+          <TextInput
+            style={styles.photoLocation}
+            onChangeText={setLocation}
+            value={location}
+            placeholder="Місцевість..."
+            placeholderTextColor="#BDBDBD"
+          />
+        </View>
+        {!takePhoto ? (
+          <TouchableWithoutFeedback>
+            <View style={styles.publishBtn}>
+              <Text style={styles.textBtn}>Опубліковати</Text>
+            </View>
+          </TouchableWithoutFeedback>
+        ) : (
+          <TouchableOpacity
+            style={[styles.publishBtn, styles.publishBtnActive]}
+            onPress={handlePublish}
+          >
+            <Text style={[styles.textBtn, styles.textBtnActive]}>
+              Опубліковати
+            </Text>
+          </TouchableOpacity>
+        )}
+        <TouchableOpacity style={styles.deletePhotoCircle}>
+          <Feather name="trash-2" size={24} color="#BDBDBD" />
+        </TouchableOpacity>
       </View>
-      <TouchableOpacity style={styles.publishBtn} onPress={handlePublish}>
-        <Text style={styles.textBtn}>Опубліковати</Text>
-      </TouchableOpacity>
-      <TouchableOpacity style={styles.deletePhotoCircle}>
-        <Feather name="trash-2" size={24} color="#BDBDBD" />
-      </TouchableOpacity>
-    </View>
+    </TouchableWithoutFeedback>
   );
 };
 
@@ -80,8 +168,6 @@ const styles = StyleSheet.create({
   photoContainer: {
     width: 343,
     height: 240,
-    alignItems: "center",
-    justifyContent: "center",
     marginBottom: 8,
     backgroundColor: "#F6F6F6",
     borderWidth: 1,
@@ -89,6 +175,9 @@ const styles = StyleSheet.create({
     borderColor: "#E8E8E8",
   },
   iconCircle: {
+    position: "absolute",
+    top: 90,
+    left: 141,
     width: 60,
     height: 60,
     alignItems: "center",
@@ -143,5 +232,34 @@ const styles = StyleSheet.create({
     width: 70,
     height: 40,
     backgroundColor: "#F6F6F6",
+  },
+  camera: {
+    width: 343,
+    height: 240,
+    marginBottom: 8,
+  },
+  photoView: {
+    flex: 1,
+    backgroundColor: "transparent",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  cameraContainer: {
+    width: 343,
+    marginBottom: 8,
+  },
+  capturedImage: {
+    flex: 1,
+    borderRadius: 8,
+  },
+  iconCircleTransp: {
+    backgroundColor: "rgba(255, 255, 255, 0.3)",
+    borderColor: "rgba(255, 255, 255, 0.3)",
+  },
+  publishBtnActive: {
+    backgroundColor: "#FF6C00",
+  },
+  textBtnActive: {
+    color: "#fff",
   },
 });
