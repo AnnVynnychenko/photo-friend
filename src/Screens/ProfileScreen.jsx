@@ -12,14 +12,16 @@ import bgImage from "../assets/img/photoBG.jpg";
 import * as ImagePicker from "expo-image-picker";
 import Feather from "react-native-vector-icons/Feather";
 import { SimpleLineIcons } from "@expo/vector-icons";
-import { useRoute } from "@react-navigation/native";
-import { useSelector } from "react-redux";
-import { getLogin } from "../redux/selectors";
+import { useDispatch, useSelector } from "react-redux";
+import { getAvatarImg, getLogin } from "../redux/selectors";
+import { clearAvatarImg, setAvatar } from "../redux/authSlice";
 
 const ProfileScreen = () => {
-  const [avatarImg, setAvatarImg] = useState(null);
+  const dispatch = useDispatch();
 
   const login = useSelector(getLogin);
+  const avatarImg = useSelector(getAvatarImg);
+  console.log("avatarImg", avatarImg);
 
   const handleAddAvatar = async () => {
     try {
@@ -32,7 +34,7 @@ const ProfileScreen = () => {
 
       if (!result.canceled) {
         const selectedImage = result.assets[0];
-        setAvatarImg(selectedImage.uri);
+        dispatch(setAvatar({ avatarImg: selectedImage.uri }));
       }
     } catch (error) {
       console.error("Error picking image:", error);
@@ -41,7 +43,7 @@ const ProfileScreen = () => {
 
   const handleDeleteAvatar = () => {
     if (avatarImg) {
-      setAvatarImg(null);
+      dispatch(clearAvatarImg());
     }
   };
 

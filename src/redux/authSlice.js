@@ -6,21 +6,26 @@ const initialState = {
   password: "",
   avatarImg: null,
 };
-console.log("initialState", initialState);
 
 const userSlice = createSlice({
   name: "user",
   initialState,
   reducers: {
-    setUser: (state, action) => {
-      const { login, email, password, avatarImg } = action.payload;
+    setUserData: (state, action) => {
+      const { login, email, password } = action.payload;
       state.login = login;
       state.email = email;
       state.password = password;
+    },
+    setAvatar: (state, action) => {
+      const { avatarImg } = action.payload;
       state.avatarImg = avatarImg;
+    },
+    clearAvatarImg: (state) => {
+      state.avatarImg = null;
     },
   },
 });
 
-export const { setUser } = userSlice.actions;
+export const { setUserData, setAvatar, clearAvatarImg } = userSlice.actions;
 export default userReducer = userSlice.reducer;

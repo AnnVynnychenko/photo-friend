@@ -16,7 +16,7 @@ import bgImage from "../assets/img/photoBG.jpg";
 import { useNavigation } from "@react-navigation/native";
 import * as ImagePicker from "expo-image-picker";
 import { useDispatch } from "react-redux";
-import { setUser } from "../redux/authSlice";
+import { setUserData, setAvatar } from "../redux/authSlice";
 
 const RegistrationScreen = () => {
   const [inputFocusState, setInputFocusState] = useState({
@@ -73,7 +73,8 @@ const RegistrationScreen = () => {
   };
 
   const handleSubmit = () => {
-    dispatch(setUser({ login, email, avatarImg }));
+    dispatch(setUserData({ login, email, password }));
+    dispatch(setAvatar({ avatarImg }));
 
     setSecurePassword(true);
     setLogin("");
