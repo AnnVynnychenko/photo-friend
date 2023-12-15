@@ -41,7 +41,6 @@ const RegistrationScreen = () => {
   };
 
   const handleSubmit = () => {
-    console.log({ email: email, password: password });
     setSecurePassword(true);
     setEmail("");
     setPassword("");
@@ -121,8 +120,6 @@ const RegistrationScreen = () => {
 
 export default RegistrationScreen;
 
-const { width } = Dimensions.get("window");
-
 const styles = StyleSheet.create({
   contentContainer: {
     flex: 1,
@@ -134,7 +131,7 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "flex-end",
     alignItems: "center",
-    width: width,
+    width: Dimensions.get("window"),
   },
   formContainer: {
     paddingTop: 32,

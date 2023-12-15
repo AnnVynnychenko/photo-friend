@@ -13,12 +13,13 @@ import * as ImagePicker from "expo-image-picker";
 import Feather from "react-native-vector-icons/Feather";
 import { SimpleLineIcons } from "@expo/vector-icons";
 import { useRoute } from "@react-navigation/native";
+import { useSelector } from "react-redux";
+import { getLogin } from "../redux/selectors";
 
 const ProfileScreen = () => {
   const [avatarImg, setAvatarImg] = useState(null);
 
-  const { params } = useRoute();
-  const { login } = params;
+  const login = useSelector(getLogin);
 
   const handleAddAvatar = async () => {
     try {

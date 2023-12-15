@@ -10,12 +10,17 @@ import {
 import Feather from "react-native-vector-icons/Feather";
 import { SimpleLineIcons } from "@expo/vector-icons";
 import uuid from "react-native-uuid";
+import { useSelector } from "react-redux";
+import { getAvatarImg, getEmail, getLogin } from "../redux/selectors";
 
 const PostsScreen = () => {
   const navigation = useNavigation();
   const { params } = useRoute();
-  const { posts, avatarImg, login, email } = params;
-  console.log("posts", posts);
+  const posts = params ? params.posts : [];
+
+  const login = useSelector(getLogin);
+  const avatarImg = useSelector(getAvatarImg);
+  const email = useSelector(getEmail);
 
   return (
     <View style={styles.contentContainer}>
@@ -28,56 +33,60 @@ const PostsScreen = () => {
           <Text style={styles.email}>{email}</Text>
         </View>
       </View>
-      <FlatList
-        data={posts}
-        keyExtractor={() => uuid.v4()}
-        renderItem={({ item: post }) => (
-          <View style={styles.postContainer}>
-            <View style={styles.photoContainer}>
-              <Image
-                source={{ uri: post.capturedImage }}
-                style={styles.capturedImage}
-              />
-            </View>
-            <Text style={styles.photoName}>{post.photoName}</Text>
-            <View style={styles.additionalInfoContainer}>
-              <View style={styles.commentContainer}>
-                <TouchableOpacity>
-                  <Feather
-                    name="message-circle"
-                    size={24}
-                    color="#BDBDBD"
-                    style={styles.commentIcon}
-                  />
-                </TouchableOpacity>
-                <Text style={styles.commentQuantity}>0</Text>
+      {posts && (
+        <FlatList
+          data={posts}
+          keyExtractor={() => uuid.v4()}
+          renderItem={({ item: post }) => (
+            <View style={styles.postContainer}>
+              <View style={styles.photoContainer}>
+                <Image
+                  source={{ uri: post.capturedImage }}
+                  style={styles.capturedImage}
+                />
               </View>
-              <View style={styles.locationContainer}>
-                {post.location ? (
+              <Text style={styles.photoName}>{post.photoName}</Text>
+              <View style={styles.additionalInfoContainer}>
+                <View style={styles.commentContainer}>
                   <TouchableOpacity
-                    onPress={() =>
-                      navigation.navigate("Map", { location: post.location })
-                    }
+                    onPress={() => navigation.navigate("Comments")}
                   >
+                    <Feather
+                      name="message-circle"
+                      size={24}
+                      color="#BDBDBD"
+                      style={styles.commentIcon}
+                    />
+                  </TouchableOpacity>
+                  <Text style={styles.commentQuantity}>0</Text>
+                </View>
+                <View style={styles.locationContainer}>
+                  {post.location ? (
+                    <TouchableOpacity
+                      onPress={() =>
+                        navigation.navigate("Map", { location: post.location })
+                      }
+                    >
+                      <SimpleLineIcons
+                        name="location-pin"
+                        size={24}
+                        color="#FF6C00"
+                      />
+                    </TouchableOpacity>
+                  ) : (
                     <SimpleLineIcons
                       name="location-pin"
                       size={24}
-                      color="#FF6C00"
+                      color="#BDBDBD"
                     />
-                  </TouchableOpacity>
-                ) : (
-                  <SimpleLineIcons
-                    name="location-pin"
-                    size={24}
-                    color="#BDBDBD"
-                  />
-                )}
-                <Text style={styles.locationText}>{post.userLocation}</Text>
+                  )}
+                  <Text style={styles.locationText}>{post.userLocation}</Text>
+                </View>
               </View>
             </View>
-          </View>
-        )}
-      />
+          )}
+        />
+      )}
     </View>
   );
 };

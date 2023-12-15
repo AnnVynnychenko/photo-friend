@@ -19,7 +19,10 @@ const MapScreen = () => {
         showsUserLocation={true}
       >
         {location && (
-          <Marker title="I am here" coordinate={location} description="Hello" />
+          <Marker
+            title="Локація створення данного фото"
+            coordinate={location}
+          />
         )}
       </MapView>
     </View>
