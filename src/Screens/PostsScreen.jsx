@@ -195,7 +195,7 @@ const styles = StyleSheet.create({
     color: "#BDBDBD",
   },
   commentQuantityActive: {
-    color: "#FF6C00",
+    color: "#212121",
   },
   commentContainer: {
     flexDirection: "row",

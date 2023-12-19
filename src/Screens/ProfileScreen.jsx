@@ -101,26 +101,51 @@ const ProfileScreen = () => {
                     <Text style={styles.photoName}>{post.photoName}</Text>
                     <View style={styles.additionalInfoContainer}>
                       <View style={styles.commentAndLikeContainer}>
-                        <View style={styles.commonContainer}>
-                          <TouchableOpacity
-                            onPress={() => {
-                              navigation.navigate("Comments", {
-                                postId: post.id,
-                                post: post,
-                              });
-                            }}
-                          >
-                            <Feather
-                              name="message-circle"
-                              size={24}
-                              color="#BDBDBD"
-                              style={styles.commentIcon}
-                            />
-                          </TouchableOpacity>
-                          <Text style={styles.quantity}>
-                            {post.commentCount}
-                          </Text>
-                        </View>
+                        {post.commentCount === 0 ? (
+                          <View style={styles.commonContainer}>
+                            <TouchableOpacity
+                              onPress={() => {
+                                navigation.navigate("Comments", {
+                                  postId: post.id,
+                                  post: post,
+                                });
+                              }}
+                            >
+                              <Feather
+                                name="message-circle"
+                                size={24}
+                                color="#BDBDBD"
+                                style={styles.commentIcon}
+                              />
+                            </TouchableOpacity>
+                            <Text style={styles.quantity}>
+                              {post.commentCount}
+                            </Text>
+                          </View>
+                        ) : (
+                          <View style={styles.commonContainer}>
+                            <TouchableOpacity
+                              onPress={() => {
+                                navigation.navigate("Comments", {
+                                  postId: post.id,
+                                  post: post,
+                                });
+                              }}
+                            >
+                              <Feather
+                                name="message-circle"
+                                size={24}
+                                color="#FF6C00"
+                                style={styles.commentIcon}
+                              />
+                            </TouchableOpacity>
+                            <Text
+                              style={[styles.quantity, styles.quantityActive]}
+                            >
+                              {post.commentCount}
+                            </Text>
+                          </View>
+                        )}
                         {post.likes === 0 ? (
                           <View style={styles.commonContainer}>
                             <TouchableOpacity
