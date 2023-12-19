@@ -14,20 +14,24 @@ import { useEffect, useState } from "react";
 import { useNavigation } from "@react-navigation/native";
 import { Camera } from "expo-camera";
 import * as MediaLibrary from "expo-media-library";
-
 import * as Location from "expo-location";
+import { useDispatch } from "react-redux";
+import { addPost } from "../redux/posts/postsSlice";
+import uuid from "react-native-uuid";
 
 const CreatePostsScreen = () => {
   const [photoName, setPhotoName] = useState("");
   const [location, setLocation] = useState({});
   const [userLocation, setUserLocation] = useState("");
+
   const [hasPermission, setHasPermission] = useState(null);
   const [cameraRef, setCameraRef] = useState(null);
   const [takePhoto, setTakePhoto] = useState(false);
   const [capturedImage, setCapturedImage] = useState(null);
-  const [posts, setPosts] = useState([]);
 
   const navigation = useNavigation();
+
+  const dispatch = useDispatch();
 
   useEffect(() => {
     (async () => {
@@ -59,11 +63,19 @@ const CreatePostsScreen = () => {
   }
 
   const handlePublish = () => {
-    const newPost = { photoName, location, capturedImage, userLocation };
-    setPosts(posts.concat(newPost));
+    const newPost = {
+      id: uuid.v4(),
+      photoName,
+      location,
+      capturedImage,
+      userLocation,
+      comments: [],
+      likes: 0,
+      commentCount: 0,
+    };
+    dispatch(addPost({ newPost }));
     navigation.navigate("Home", {
       screen: "Posts",
-      params: { posts: posts.concat(newPost) },
     });
     setPhotoName("");
     setLocation({});
@@ -247,6 +259,10 @@ const styles = StyleSheet.create({
     height: 40,
     backgroundColor: "#F6F6F6",
   },
+  cameraContainer: {
+    width: 343,
+    marginBottom: 8,
+  },
   camera: {
     width: 343,
     height: 240,
@@ -258,10 +274,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
   },
-  cameraContainer: {
-    width: 343,
-    marginBottom: 8,
-  },
+
   capturedImage: {
     flex: 1,
     borderRadius: 8,

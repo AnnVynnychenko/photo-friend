@@ -1,4 +1,4 @@
-import { useNavigation, useRoute } from "@react-navigation/native";
+import { useNavigation } from "@react-navigation/native";
 import {
   View,
   StyleSheet,
@@ -11,12 +11,13 @@ import Feather from "react-native-vector-icons/Feather";
 import { SimpleLineIcons } from "@expo/vector-icons";
 import uuid from "react-native-uuid";
 import { useSelector } from "react-redux";
-import { getAvatarImg, getEmail, getLogin } from "../redux/selectors";
+import { getAvatarImg, getEmail, getLogin } from "../redux/auth/selectors";
+import { getPosts } from "../redux/posts/selectors.js";
 
 const PostsScreen = () => {
   const navigation = useNavigation();
-  const { params } = useRoute();
-  const posts = params ? params.posts : [];
+
+  const posts = useSelector(getPosts);
 
   const login = useSelector(getLogin);
   const avatarImg = useSelector(getAvatarImg);
@@ -47,19 +48,54 @@ const PostsScreen = () => {
               </View>
               <Text style={styles.photoName}>{post.photoName}</Text>
               <View style={styles.additionalInfoContainer}>
-                <View style={styles.commentContainer}>
-                  <TouchableOpacity
-                    onPress={() => navigation.navigate("Comments")}
-                  >
-                    <Feather
-                      name="message-circle"
-                      size={24}
-                      color="#BDBDBD"
-                      style={styles.commentIcon}
-                    />
-                  </TouchableOpacity>
-                  <Text style={styles.commentQuantity}>0</Text>
-                </View>
+                {post.commentCount === 0 ? (
+                  <View style={styles.commentContainer}>
+                    <TouchableOpacity
+                      onPress={() =>
+                        navigation.navigate("Comments", {
+                          postId: post.id,
+                          post: post,
+                        })
+                      }
+                    >
+                      <Feather
+                        name="message-circle"
+                        size={24}
+                        color="#BDBDBD"
+                        style={styles.commentIcon}
+                      />
+                    </TouchableOpacity>
+                    <Text style={styles.commentQuantity}>
+                      {post.commentCount}
+                    </Text>
+                  </View>
+                ) : (
+                  <View style={styles.commentContainer}>
+                    <TouchableOpacity
+                      onPress={() =>
+                        navigation.navigate("Comments", {
+                          postId: post.id,
+                          post: post,
+                        })
+                      }
+                    >
+                      <Feather
+                        name="message-circle"
+                        size={24}
+                        color="#FF6C00"
+                        style={styles.commentIcon}
+                      />
+                    </TouchableOpacity>
+                    <Text
+                      style={[
+                        styles.commentQuantity,
+                        styles.commentQuantityActive,
+                      ]}
+                    >
+                      {post.commentCount}
+                    </Text>
+                  </View>
+                )}
                 <View style={styles.locationContainer}>
                   {post.location ? (
                     <TouchableOpacity
@@ -151,10 +187,15 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     gap: 49,
   },
-  commentIcon: { transform: [{ rotate: "270deg" }] },
+  commentIcon: {
+    transform: [{ rotate: "270deg" }],
+  },
   commentQuantity: {
     fontSize: 16,
     color: "#BDBDBD",
+  },
+  commentQuantityActive: {
+    color: "#FF6C00",
   },
   commentContainer: {
     flexDirection: "row",

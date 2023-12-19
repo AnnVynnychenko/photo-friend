@@ -1,5 +1,5 @@
-import React, { useState } from "react";
-import { Dimensions } from "react-native";
+import React from "react";
+import { Dimensions, FlatList } from "react-native";
 import {
   ImageBackground,
   View,
@@ -13,15 +13,20 @@ import * as ImagePicker from "expo-image-picker";
 import Feather from "react-native-vector-icons/Feather";
 import { SimpleLineIcons } from "@expo/vector-icons";
 import { useDispatch, useSelector } from "react-redux";
-import { getAvatarImg, getLogin } from "../redux/selectors";
-import { clearAvatarImg, setAvatar } from "../redux/authSlice";
+import { getAvatarImg, getLogin } from "../redux/auth/selectors";
+import { clearAvatarImg, setAvatar } from "../redux/auth/authSlice";
+import { getPosts } from "../redux/posts/selectors";
+import { useNavigation } from "@react-navigation/native";
+import { incrementLike } from "../redux/posts/postsSlice";
 
 const ProfileScreen = () => {
   const dispatch = useDispatch();
 
+  const navigation = useNavigation();
+
   const login = useSelector(getLogin);
   const avatarImg = useSelector(getAvatarImg);
-  console.log("avatarImg", avatarImg);
+  const posts = useSelector(getPosts);
 
   const handleAddAvatar = async () => {
     try {
@@ -47,6 +52,10 @@ const ProfileScreen = () => {
     }
   };
 
+  const handleIncrementLike = (postId) => {
+    dispatch(incrementLike({ postId }));
+  };
+
   return (
     <View style={styles.contentContainer}>
       <ImageBackground
@@ -54,60 +63,127 @@ const ProfileScreen = () => {
         style={styles.bgImage}
         resizeMode="cover"
       >
-        <View style={styles.formContainer}>
-          <View style={styles.avatar}>
-            {avatarImg ? (
-              <View>
-                <Image source={{ uri: avatarImg }} style={styles.avatarImg} />
-                <TouchableOpacity onPress={handleDeleteAvatar}>
-                  <View style={styles.deleteAvatarBtnCircle}>
-                    <View style={styles.deleteAvatarBtnVerticalLine} />
-                    <View style={styles.deleteAvatarBtnHorizontalLine} />
+        <View style={styles.container}>
+          <View style={styles.formContainer}>
+            <View style={styles.avatar}>
+              {avatarImg ? (
+                <View>
+                  <Image source={{ uri: avatarImg }} style={styles.avatarImg} />
+                  <TouchableOpacity onPress={handleDeleteAvatar}>
+                    <View style={styles.deleteAvatarBtnCircle}>
+                      <View style={styles.deleteAvatarBtnVerticalLine} />
+                      <View style={styles.deleteAvatarBtnHorizontalLine} />
+                    </View>
+                  </TouchableOpacity>
+                </View>
+              ) : (
+                <TouchableOpacity onPress={handleAddAvatar}>
+                  <View style={styles.addAvatarBtnCircle}>
+                    <View style={styles.addAvatarBtnVerticalLine} />
+                    <View style={styles.addAvatarBtnHorizontalLine} />
                   </View>
                 </TouchableOpacity>
-              </View>
-            ) : (
-              <TouchableOpacity onPress={handleAddAvatar}>
-                <View style={styles.addAvatarBtnCircle}>
-                  <View style={styles.addAvatarBtnVerticalLine} />
-                  <View style={styles.addAvatarBtnHorizontalLine} />
-                </View>
-              </TouchableOpacity>
-            )}
-          </View>
-          <Text style={styles.title}>{login}</Text>
-          <View style={styles.postContainer}>
-            <View style={styles.photoContainer}>{/* <Image/> */}</View>
-            <Text style={styles.photoName}></Text>
-            <View style={styles.additionalInfoContainer}>
-              <View style={styles.commentAndLikeContainer}>
-                <View style={styles.commonContainer}>
-                  <TouchableOpacity>
-                    <Feather
-                      name="message-circle"
-                      size={24}
-                      color="#BDBDBD"
-                      style={styles.commentIcon}
-                    />
-                  </TouchableOpacity>
-                  <Text style={styles.quantity}>0</Text>
-                </View>
-                <View style={styles.commonContainer}>
-                  <TouchableOpacity>
-                    <Feather name="thumbs-up" size={24} color="#BDBDBD" />
-                  </TouchableOpacity>
-                  <Text style={styles.quantity}>0</Text>
-                </View>
-              </View>
-              <View style={styles.locationContainer}>
-                <SimpleLineIcons
-                  name="location-pin"
-                  size={24}
-                  color="#BDBDBD"
-                />
-                <Text style={styles.locationText}></Text>
-              </View>
+              )}
             </View>
+            <Text style={styles.title}>{login}</Text>
+            {posts && (
+              <FlatList
+                data={posts}
+                keyExtractor={(item) => item.id}
+                renderItem={({ item: post }) => (
+                  <View style={styles.postContainer}>
+                    <View style={styles.photoContainer}>
+                      <Image
+                        source={{ uri: post.capturedImage }}
+                        style={styles.capturedImage}
+                      />
+                    </View>
+                    <Text style={styles.photoName}>{post.photoName}</Text>
+                    <View style={styles.additionalInfoContainer}>
+                      <View style={styles.commentAndLikeContainer}>
+                        <View style={styles.commonContainer}>
+                          <TouchableOpacity
+                            onPress={() => {
+                              navigation.navigate("Comments", {
+                                postId: post.id,
+                                post: post,
+                              });
+                            }}
+                          >
+                            <Feather
+                              name="message-circle"
+                              size={24}
+                              color="#BDBDBD"
+                              style={styles.commentIcon}
+                            />
+                          </TouchableOpacity>
+                          <Text style={styles.quantity}>
+                            {post.commentCount}
+                          </Text>
+                        </View>
+                        {post.likes === 0 ? (
+                          <View style={styles.commonContainer}>
+                            <TouchableOpacity
+                              onPress={() => handleIncrementLike(post.id)}
+                            >
+                              <Feather
+                                name="thumbs-up"
+                                size={24}
+                                color="#BDBDBD"
+                              />
+                            </TouchableOpacity>
+                            <Text style={styles.quantity}>{post.likes}</Text>
+                          </View>
+                        ) : (
+                          <View style={styles.commonContainer}>
+                            <TouchableOpacity
+                              onPress={() => handleIncrementLike(post.id)}
+                            >
+                              <Feather
+                                name="thumbs-up"
+                                size={24}
+                                color="#FF6C00"
+                              />
+                            </TouchableOpacity>
+                            <Text
+                              style={[styles.quantity, styles.quantityActive]}
+                            >
+                              {post.likes}
+                            </Text>
+                          </View>
+                        )}
+                      </View>
+                      <View style={styles.locationContainer}>
+                        {post.location ? (
+                          <TouchableOpacity
+                            onPress={() =>
+                              navigation.navigate("Map", {
+                                location: post.location,
+                              })
+                            }
+                          >
+                            <SimpleLineIcons
+                              name="location-pin"
+                              size={24}
+                              color="#FF6C00"
+                            />
+                          </TouchableOpacity>
+                        ) : (
+                          <SimpleLineIcons
+                            name="location-pin"
+                            size={24}
+                            color="#BDBDBD"
+                          />
+                        )}
+                        <Text style={styles.locationText}>
+                          {post.userLocation}
+                        </Text>
+                      </View>
+                    </View>
+                  </View>
+                )}
+              />
+            )}
           </View>
         </View>
       </ImageBackground>
@@ -116,8 +192,6 @@ const ProfileScreen = () => {
 };
 
 export default ProfileScreen;
-
-const { width } = Dimensions.get("window");
 
 const styles = StyleSheet.create({
   contentContainer: {
@@ -130,11 +204,18 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "flex-end",
     alignItems: "center",
-    width: width,
+    width: Dimensions.get("window"),
+  },
+  container: {
+    flex: 1,
+    paddingTop: 203,
+    backgroundColor: "transparent",
+    justifyContent: "flex-end",
   },
   formContainer: {
-    width: width,
+    width: Dimensions.get("window"),
     alignItems: "center",
+
     paddingTop: 92,
     paddingBottom: 45,
     paddingHorizontal: 16,
@@ -224,9 +305,6 @@ const styles = StyleSheet.create({
   photoContainer: {
     width: 343,
     height: 240,
-    marginBottom: 32,
-    alignItems: "center",
-    justifyContent: "center",
     marginBottom: 8,
     backgroundColor: "#F6F6F6",
     borderWidth: 1,
@@ -247,6 +325,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: "#BDBDBD",
   },
+  quantityActive: { color: "#212121" },
   commentAndLikeContainer: {
     flexDirection: "row",
     gap: 24,
@@ -265,5 +344,9 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: "#212121",
     textDecorationLine: "underline",
+  },
+  capturedImage: {
+    flex: 1,
+    borderRadius: 8,
   },
 });

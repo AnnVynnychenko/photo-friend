@@ -16,7 +16,7 @@ import bgImage from "../assets/img/photoBG.jpg";
 import { useNavigation } from "@react-navigation/native";
 import * as ImagePicker from "expo-image-picker";
 import { useDispatch } from "react-redux";
-import { setUserData, setAvatar } from "../redux/authSlice";
+import { setUserData, setAvatar } from "../redux/auth/authSlice";
 
 const RegistrationScreen = () => {
   const [inputFocusState, setInputFocusState] = useState({
@@ -224,7 +224,6 @@ const styles = StyleSheet.create({
     height: 50,
     width: 343,
     paddingHorizontal: 16,
-    fontFamily: "Roboto-Regular",
     fontSize: 16,
     backgroundColor: "#f6f6f6",
     borderColor: "#e8e8e8",
@@ -235,7 +234,6 @@ const styles = StyleSheet.create({
     height: 50,
     width: 343,
     paddingHorizontal: 16,
-    fontFamily: "Roboto-Regular",
     fontSize: 16,
     borderColor: "#FF6C00",
     backgroundColor: "#fff",

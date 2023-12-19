@@ -1,16 +1,15 @@
 import { Feather } from "@expo/vector-icons";
+import { useNavigation } from "@react-navigation/native";
 import { View, Text, TouchableOpacity, Image, StyleSheet } from "react-native";
 
 const HeaderCommentsScreen = () => {
+  const navigation = useNavigation();
   return (
     <View style={styles.headerContainer}>
-      <TouchableOpacity
-        style={{ marginLeft: 16 }}
-        // onPress={() => navigation.goBack()}
-      >
+      <TouchableOpacity onPress={() => navigation.goBack()}>
         <Feather name="arrow-left" size={24} color="rgba(33, 33, 33, 0.8)" />
-        <Text style={styles.headerTitle}>Коментарі</Text>
       </TouchableOpacity>
+      <Text style={styles.headerTitle}>Коментарі</Text>
     </View>
   );
 };
@@ -21,7 +20,6 @@ const styles = StyleSheet.create({
   headerContainer: {
     flexDirection: "row",
     gap: 109,
-    paddingLeft: 148,
     justifyContent: "flex-end",
   },
   headerTitle: {
