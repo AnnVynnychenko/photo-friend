@@ -17,6 +17,9 @@ import { useNavigation } from "@react-navigation/native";
 import * as ImagePicker from "expo-image-picker";
 import { useDispatch } from "react-redux";
 import { setUserData, setAvatar } from "../redux/auth/authSlice";
+import { updateProfile } from "firebase/auth";
+import { auth } from "../firebase/firebaseConfig";
+import { registerDB } from "../firebase/service";
 
 const RegistrationScreen = () => {
   const [inputFocusState, setInputFocusState] = useState({
@@ -71,20 +74,31 @@ const RegistrationScreen = () => {
       [fieldName]: false,
     }));
   };
+  const handleSubmit = async () => {
+    try {
+      await registerDB({ email, password });
+      const user = auth.currentUser;
+      console.log("user", user);
+      if (user) {
+        await updateProfile(user, {
+          displayName: login,
+        });
+      }
+      dispatch(setUserData({ login, email, password }));
+      dispatch(setAvatar({ avatarImg }));
 
-  const handleSubmit = () => {
-    dispatch(setUserData({ login, email, password }));
-    dispatch(setAvatar({ avatarImg }));
+      setSecurePassword(true);
+      setLogin("");
+      setEmail("");
+      setPassword("");
+      setAvatarImg(null);
 
-    setSecurePassword(true);
-    setLogin("");
-    setEmail("");
-    setPassword("");
-    setAvatarImg(null);
-
-    navigation.navigate("Home", {
-      screen: "Posts",
-    });
+      navigation.navigate("Home", {
+        screen: "Posts",
+      });
+    } catch (error) {
+      console.error("Error during registration:", error);
+    }
   };
 
   const handleViewPassword = () => {

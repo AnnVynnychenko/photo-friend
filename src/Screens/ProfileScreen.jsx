@@ -218,6 +218,8 @@ const ProfileScreen = () => {
 
 export default ProfileScreen;
 
+const width = Dimensions.get("window").width;
+
 const styles = StyleSheet.create({
   contentContainer: {
     flex: 1,
@@ -229,7 +231,7 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "flex-end",
     alignItems: "center",
-    width: Dimensions.get("window"),
+    width: width,
   },
   container: {
     flex: 1,
@@ -238,7 +240,7 @@ const styles = StyleSheet.create({
     justifyContent: "flex-end",
   },
   formContainer: {
-    width: Dimensions.get("window"),
+    width: width,
     alignItems: "center",
 
     paddingTop: 92,

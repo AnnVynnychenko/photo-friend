@@ -21,7 +21,7 @@ import uuid from "react-native-uuid";
 
 const CreatePostsScreen = () => {
   const [photoName, setPhotoName] = useState("");
-  const [location, setLocation] = useState({});
+  const [currentLocation, setCurrentLocation] = useState({});
   const [userLocation, setUserLocation] = useState("");
 
   const [hasPermission, setHasPermission] = useState(null);
@@ -51,9 +51,9 @@ const CreatePostsScreen = () => {
         latitude: location.coords.latitude,
         longitude: location.coords.longitude,
       };
-      setLocation(coords);
+      setCurrentLocation(coords);
     })();
-  }, []);
+  }, [takePhoto]);
 
   if (hasPermission === null) {
     return <View />;
@@ -66,7 +66,7 @@ const CreatePostsScreen = () => {
     const newPost = {
       id: uuid.v4(),
       photoName,
-      location,
+      location: currentLocation,
       capturedImage,
       userLocation,
       comments: [],
@@ -78,7 +78,7 @@ const CreatePostsScreen = () => {
       screen: "Posts",
     });
     setPhotoName("");
-    setLocation({});
+    setCurrentLocation({});
     setUserLocation("");
     setCapturedImage(null);
     setTakePhoto(false);

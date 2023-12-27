@@ -4,6 +4,8 @@ import CreatePostsScreen from "./CreatePostsScreen";
 import ProfileScreen from "./ProfileScreen";
 import Feather from "react-native-vector-icons/Feather";
 import { Text, TouchableOpacity } from "react-native";
+import { auth } from "../firebase/firebaseConfig";
+import { useNavigation } from "@react-navigation/native";
 
 const HomeTab = createBottomTabNavigator();
 
@@ -56,6 +58,16 @@ const tabBarOption = ({ route }) => ({
   },
 });
 const HomeScreen = ({ navigation }) => {
+  const navigationToPage = useNavigation();
+  const handleLogOut = async () => {
+    try {
+      await auth.signOut();
+      navigationToPage.navigate("Login");
+      console.log("User signed out successfully");
+    } catch (error) {
+      console.error("Error during sign out:", error);
+    }
+  };
   return (
     <HomeTab.Navigator screenOptions={tabBarOption}>
       <HomeTab.Screen
@@ -63,7 +75,7 @@ const HomeScreen = ({ navigation }) => {
         component={PostsScreen}
         options={{
           headerRight: () => (
-            <TouchableOpacity>
+            <TouchableOpacity onPress={handleLogOut}>
               <Feather
                 name="log-out"
                 size={24}
