@@ -1,11 +1,22 @@
-import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
-import PostsScreen from "./PostsScreen";
-import CreatePostsScreen from "./CreatePostsScreen";
-import ProfileScreen from "./ProfileScreen";
-import Feather from "react-native-vector-icons/Feather";
+//react
+import React from "react";
+//react-native
 import { Text, TouchableOpacity } from "react-native";
-import { auth } from "../firebase/firebaseConfig";
+//navigation
+import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { useNavigation } from "@react-navigation/native";
+//screens
+import { PostsScreen } from "./PostsScreen";
+import { CreatePostsScreen } from "./CreatePostsScreen";
+import { ProfileScreen } from "./ProfileScreen";
+//icon
+import Feather from "react-native-vector-icons/Feather";
+//firebase
+import { auth } from "../../firebase/firebaseConfig";
+import { signOut } from "firebase/auth";
+import { useDispatch } from "react-redux";
+import { authSignOut } from "../../redux/auth/authSlice";
+import { signOutUser } from "../../redux/posts/postsSlice";
 
 const HomeTab = createBottomTabNavigator();
 
@@ -57,11 +68,14 @@ const tabBarOption = ({ route }) => ({
     shadowRadius: 0,
   },
 });
-const HomeScreen = ({ navigation }) => {
+export const HomeScreen = ({ navigation }) => {
   const navigationToPage = useNavigation();
+  const dispatch = useDispatch();
   const handleLogOut = async () => {
     try {
-      await auth.signOut();
+      await signOut(auth);
+      dispatch(authSignOut());
+      dispatch(signOutUser());
       navigationToPage.navigate("Login");
       console.log("User signed out successfully");
     } catch (error) {
@@ -139,5 +153,3 @@ const HomeScreen = ({ navigation }) => {
     </HomeTab.Navigator>
   );
 };
-
-export default HomeScreen;

@@ -1,4 +1,6 @@
-import { useState } from "react";
+//react
+import React, { useState } from "react";
+//react-native
 import {
   FlatList,
   Image,
@@ -12,19 +14,22 @@ import {
   View,
   Dimensions,
 } from "react-native";
+import uuid from "react-native-uuid";
+//icon
 import { Feather } from "@expo/vector-icons";
+//redux
 import { useDispatch, useSelector } from "react-redux";
 import {
   addComment,
   incrementCommentCounter,
 } from "../../redux/posts/postsSlice";
-import moment from "moment";
-import "moment/locale/uk";
 import { getAvatarImg } from "../../redux/auth/selectors";
 import { getCommentsForPost } from "../../redux/posts/selectors";
-import uuid from "react-native-uuid";
+//date
+import moment from "moment";
+import "moment/locale/uk";
 
-const CommentsScreen = ({ route }) => {
+export const CommentsScreen = ({ route }) => {
   const { postId, post } = route.params;
 
   const [comment, setComment] = useState("");
@@ -115,8 +120,6 @@ const CommentsScreen = ({ route }) => {
     </TouchableWithoutFeedback>
   );
 };
-
-export default CommentsScreen;
 
 const styles = StyleSheet.create({
   contentContainer: {

@@ -1,4 +1,6 @@
+//react
 import React from "react";
+//react-native
 import { Dimensions, FlatList } from "react-native";
 import {
   ImageBackground,
@@ -8,25 +10,33 @@ import {
   Text,
   TouchableOpacity,
 } from "react-native";
-import bgImage from "../assets/img/photoBG.jpg";
+//img and icon
+import bgImage from "../../assets/img/photoBG.jpg";
 import * as ImagePicker from "expo-image-picker";
 import Feather from "react-native-vector-icons/Feather";
 import { SimpleLineIcons } from "@expo/vector-icons";
+//redux
+import { incrementLike } from "../../redux/posts/postsSlice";
 import { useDispatch, useSelector } from "react-redux";
-import { getAvatarImg, getLogin } from "../redux/auth/selectors";
-import { clearAvatarImg, setAvatar } from "../redux/auth/authSlice";
-import { getPosts } from "../redux/posts/selectors";
+import { getAvatarImg, getLogin } from "../../redux/auth/selectors";
+import { clearAvatarImg, setAvatar } from "../../redux/auth/authSlice";
+import { getPosts } from "../../redux/posts/selectors";
+//navigation
 import { useNavigation } from "@react-navigation/native";
-import { incrementLike } from "../redux/posts/postsSlice";
+import { uploadAvatarToServer } from "../../firebase/service";
+import { updateProfile } from "firebase/auth";
+import { auth } from "../../firebase/firebaseConfig";
 
-const ProfileScreen = () => {
+export const ProfileScreen = () => {
   const dispatch = useDispatch();
 
   const navigation = useNavigation();
 
-  const login = useSelector(getLogin);
   const avatarImg = useSelector(getAvatarImg);
   const posts = useSelector(getPosts);
+  const login = useSelector(getLogin);
+
+  const user = auth.currentUser;
 
   const handleAddAvatar = async () => {
     try {
@@ -39,15 +49,26 @@ const ProfileScreen = () => {
 
       if (!result.canceled) {
         const selectedImage = result.assets[0];
-        dispatch(setAvatar({ avatarImg: selectedImage.uri }));
+        const photoLink = await uploadAvatarToServer({
+          uri: selectedImage.uri,
+          mimeType: selectedImage.uri.split(".").pop(),
+        });
+
+        await updateProfile(user, {
+          photoURL: photoLink,
+        });
+        dispatch(setAvatar({ avatarImg: photoLink }));
       }
     } catch (error) {
       console.error("Error picking image:", error);
     }
   };
 
-  const handleDeleteAvatar = () => {
+  const handleDeleteAvatar = async () => {
     if (avatarImg) {
+      await updateProfile(user, {
+        photoURL: "",
+      });
       dispatch(clearAvatarImg());
     }
   };
@@ -215,8 +236,6 @@ const ProfileScreen = () => {
     </View>
   );
 };
-
-export default ProfileScreen;
 
 const width = Dimensions.get("window").width;
 

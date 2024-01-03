@@ -1,8 +1,9 @@
+//react-native
 import { useRoute } from "@react-navigation/native";
 import { Dimensions, StyleSheet, View } from "react-native";
 import MapView, { Marker } from "react-native-maps";
 
-const MapScreen = () => {
+export const MapScreen = () => {
   const { params } = useRoute();
   const { location } = params;
 
@@ -28,8 +29,6 @@ const MapScreen = () => {
     </View>
   );
 };
-
-export default MapScreen;
 
 const styles = StyleSheet.create({
   container: {

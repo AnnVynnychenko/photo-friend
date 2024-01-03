@@ -1,18 +1,23 @@
+//react-native
 import "react-native-gesture-handler";
+import { ActivityIndicator } from "react-native";
+//expo
 import { StatusBar } from "expo-status-bar";
-import RegistrationScreen from "./Screens/RegistrationScreen";
-import LoginScreen from "./Screens/LoginScreen";
 import { useFonts } from "expo-font";
+//screens
+import { RegistrationScreen } from "./Screens/authScreens/RegistrationScreen";
+import { LoginScreen } from "./Screens/authScreens/LoginScreen";
+import { HomeScreen } from "./Screens/mainScreens/HomeScreen";
+import { MapScreen } from "./Screens/nestedScreens/MapScreen";
+import { CommentsScreen } from "./Screens/nestedScreens/CommentsScreen";
+import { HeaderCommentsScreen } from "./components/HeaderCommentsScreen";
+//navigation
 import { NavigationContainer } from "@react-navigation/native";
 import { createStackNavigator } from "@react-navigation/stack";
-import HomeScreen from "./Screens/HomeScreen";
-import MapScreen from "./Screens/MapScreen";
-import CommentsScreen from "./Screens/CommentsScreen/CommentsScreen";
-import HeaderCommentsScreen from "./Screens/CommentsScreen/HeaderCommentsScreen";
+//redux
 import { PersistGate } from "redux-persist/integration/react";
 import { Provider } from "react-redux";
 import store from "./redux/store";
-import { ActivityIndicator } from "react-native";
 
 const MainStack = createStackNavigator();
 

@@ -1,8 +1,10 @@
+//react-native
+import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
+//icon
 import { Feather } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
-import { View, Text, TouchableOpacity, Image, StyleSheet } from "react-native";
 
-const HeaderCommentsScreen = () => {
+export const HeaderCommentsScreen = () => {
   const navigation = useNavigation();
   return (
     <View style={styles.headerContainer}>
@@ -13,8 +15,6 @@ const HeaderCommentsScreen = () => {
     </View>
   );
 };
-
-export default HeaderCommentsScreen;
 
 const styles = StyleSheet.create({
   headerContainer: {

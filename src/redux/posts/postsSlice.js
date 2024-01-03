@@ -9,9 +9,9 @@ const postsSlice = createSlice({
   initialState,
   reducers: {
     addPost: (state, action) => {
-      const { newPost } = action.payload;
-      const postWithComments = { ...newPost, comments: [] };
-      state.posts = [...state.posts, postWithComments];
+      const { posts } = action.payload;
+      state.posts = posts;
+      console.log("postsSlice", posts);
     },
     addComment: (state, action) => {
       const { postId, newComment } = action.payload;
@@ -40,9 +40,15 @@ const postsSlice = createSlice({
           state.posts[postIndex].comments.length;
       }
     },
+    signOutUser: () => initialState,
   },
 });
 
-export const { addPost, addComment, incrementLike, incrementCommentCounter } =
-  postsSlice.actions;
+export const {
+  addPost,
+  addComment,
+  incrementLike,
+  incrementCommentCounter,
+  signOutUser,
+} = postsSlice.actions;
 export default postsReducer = postsSlice.reducer;

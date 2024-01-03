@@ -1,3 +1,6 @@
+//react
+import React, { useEffect, useState } from "react";
+//react-native
 import {
   Image,
   Keyboard,
@@ -8,18 +11,25 @@ import {
   TouchableWithoutFeedback,
   View,
 } from "react-native";
+import uuid from "react-native-uuid";
+//icon
 import { FontAwesome5, SimpleLineIcons } from "@expo/vector-icons";
 import Feather from "react-native-vector-icons/Feather";
-import { useEffect, useState } from "react";
+//navigation
 import { useNavigation } from "@react-navigation/native";
+//media and location
 import { Camera } from "expo-camera";
 import * as MediaLibrary from "expo-media-library";
 import * as Location from "expo-location";
+//redux
 import { useDispatch } from "react-redux";
-import { addPost } from "../redux/posts/postsSlice";
-import uuid from "react-native-uuid";
+import { addPost } from "../../redux/posts/postsSlice";
+//firebase
+import { collection, addDoc } from "firebase/firestore";
+import { db } from "../../firebase/firebaseConfig";
+import { writeDataToFirestore } from "../../firebase/service";
 
-const CreatePostsScreen = () => {
+export const CreatePostsScreen = () => {
   const [photoName, setPhotoName] = useState("");
   const [currentLocation, setCurrentLocation] = useState({});
   const [userLocation, setUserLocation] = useState("");
@@ -40,6 +50,9 @@ const CreatePostsScreen = () => {
 
       setHasPermission(status === "granted");
     })();
+  }, [takePhoto]);
+
+  useEffect(() => {
     (async () => {
       let { status } = await Location.requestForegroundPermissionsAsync();
       if (status !== "granted") {
@@ -73,7 +86,7 @@ const CreatePostsScreen = () => {
       likes: 0,
       commentCount: 0,
     };
-    dispatch(addPost({ newPost }));
+    writeDataToFirestore(newPost);
     navigation.navigate("Home", {
       screen: "Posts",
     });
@@ -178,8 +191,6 @@ const CreatePostsScreen = () => {
     </TouchableWithoutFeedback>
   );
 };
-
-export default CreatePostsScreen;
 
 const styles = StyleSheet.create({
   contentContainer: {

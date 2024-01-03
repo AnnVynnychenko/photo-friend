@@ -1,4 +1,6 @@
+//react
 import React, { useState } from "react";
+//react-native
 import { Dimensions } from "react-native";
 import {
   ImageBackground,
@@ -12,19 +14,58 @@ import {
   Keyboard,
 } from "react-native";
 import { KeyboardAvoidingView } from "react-native";
-import bgImage from "../assets/img/photoBG.jpg";
+//img
+import bgImage from "../../assets/img/photoBG.jpg";
+import * as ImagePicker from "expo-image-picker";
+//navigation
 import { useNavigation } from "@react-navigation/native";
+//redux
+import { useDispatch } from "react-redux";
+import { setUserData, setAvatar } from "../../redux/auth/authSlice";
+//firebase
+import { updateProfile } from "firebase/auth";
+import { auth } from "../../firebase/firebaseConfig";
+import { registerDB, uploadAvatarToServer } from "../../firebase/service";
 
-const RegistrationScreen = () => {
+export const RegistrationScreen = () => {
   const [inputFocusState, setInputFocusState] = useState({
+    login: false,
     email: false,
     password: false,
   });
   const [securePassword, setSecurePassword] = useState(true);
+  const [login, setLogin] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [avatarImg, setAvatarImg] = useState(null);
 
   const navigation = useNavigation();
+
+  const dispatch = useDispatch();
+
+  const handleAddAvatar = async () => {
+    try {
+      const result = await ImagePicker.launchImageLibraryAsync({
+        mediaTypes: ImagePicker.MediaTypeOptions.Images,
+        allowsEditing: true,
+        aspect: [1, 1],
+        quality: 1,
+      });
+
+      if (!result.canceled) {
+        const selectedImage = result.assets[0];
+        setAvatarImg(selectedImage.uri);
+      }
+    } catch (error) {
+      console.error("Error picking image:", error);
+    }
+  };
+
+  const handleDeleteAvatar = () => {
+    if (avatarImg) {
+      setAvatarImg(null);
+    }
+  };
 
   const handleInputOnFocus = (fieldName) => {
     setInputFocusState((prevState) => ({
@@ -40,12 +81,48 @@ const RegistrationScreen = () => {
     }));
   };
 
-  const handleSubmit = () => {
-    setSecurePassword(true);
+  const reset = () => {
+    setLogin("");
     setEmail("");
     setPassword("");
+    setAvatarImg(null);
+  };
 
-    navigation.navigate("Home", { screen: "Posts", params: { email } });
+  const handleSubmit = async () => {
+    try {
+      const trimmedEmail = email.trim();
+      const trimmedPassword = password.trim();
+      const trimmedLogin = login.trim();
+      await registerDB({ email: trimmedEmail, password: trimmedPassword });
+      const user = auth.currentUser;
+
+      if (user !== null) {
+        const photoLink = await uploadAvatarToServer({
+          uri: avatarImg,
+          mimeType: avatarImg.split(".").pop(),
+        });
+        await updateProfile(user, {
+          displayName: trimmedLogin,
+          photoURL: photoLink,
+        });
+        dispatch(
+          setUserData({
+            login: user.displayName,
+            email: user.email,
+          })
+        );
+        dispatch(setAvatar({ avatarImg: user.photoURL }));
+        navigation.navigate("Home", {
+          screen: "Posts",
+        });
+      } else {
+        navigation.navigate("Login");
+      }
+      setSecurePassword(true);
+      reset();
+    } catch (error) {
+      console.error("Error during registration:", error);
+    }
   };
 
   const handleViewPassword = () => {
@@ -57,7 +134,7 @@ const RegistrationScreen = () => {
       <View style={styles.contentContainer}>
         <KeyboardAvoidingView
           behavior={Platform.OS == "ios" ? "padding" : "height"}
-          keyboardVerticalOffset={-230}
+          keyboardVerticalOffset={-200}
         >
           <ImageBackground
             source={bgImage}
@@ -65,8 +142,43 @@ const RegistrationScreen = () => {
             resizeMode="cover"
           >
             <View style={styles.formContainer}>
-              <Text style={styles.title}>Увійти</Text>
+              <View style={styles.avatar}>
+                {avatarImg ? (
+                  <View>
+                    <Image
+                      source={{ uri: avatarImg }}
+                      style={styles.avatarImg}
+                    />
+                    <TouchableOpacity onPress={handleDeleteAvatar}>
+                      <View style={styles.deleteAvatarBtnCircle}>
+                        <View style={styles.deleteAvatarBtnVerticalLine} />
+                        <View style={styles.deleteAvatarBtnHorizontalLine} />
+                      </View>
+                    </TouchableOpacity>
+                  </View>
+                ) : (
+                  <TouchableOpacity onPress={handleAddAvatar}>
+                    <View style={styles.addAvatarBtnCircle}>
+                      <View style={styles.addAvatarBtnVerticalLine} />
+                      <View style={styles.addAvatarBtnHorizontalLine} />
+                    </View>
+                  </TouchableOpacity>
+                )}
+              </View>
+              <Text style={styles.title}>Реєстрація</Text>
               <View style={styles.inputContainer}>
+                <TextInput
+                  style={
+                    inputFocusState.login
+                      ? styles.formInputFocus
+                      : styles.formInput
+                  }
+                  onFocus={() => handleInputOnFocus("login")}
+                  onBlur={() => handleInputOnBlur("login")}
+                  onChangeText={setLogin}
+                  value={login}
+                  placeholder="Логін"
+                />
                 <TextInput
                   style={
                     inputFocusState.email
@@ -98,15 +210,18 @@ const RegistrationScreen = () => {
                 </TouchableOpacity>
               </View>
               <TouchableOpacity style={styles.formBtn} onPress={handleSubmit}>
-                <Text style={styles.textBtn}>Увійти</Text>
+                <Text style={styles.textBtn}>Зареєструватися</Text>
               </TouchableOpacity>
 
               <View style={styles.footerContainer}>
-                <Text style={styles.footerText}>Немає акаунту? </Text>
+                <Text style={styles.footerText}> Вже є акаунт? </Text>
                 <TouchableOpacity
-                  onPress={() => navigation.navigate("Registration")}
+                  onPress={() => {
+                    navigation.navigate("Login");
+                    reset();
+                  }}
                 >
-                  <Text style={styles.footerRegisterText}>Зареєструватися</Text>
+                  <Text style={styles.footerText}>Увійти</Text>
                 </TouchableOpacity>
               </View>
               <View />
@@ -117,10 +232,6 @@ const RegistrationScreen = () => {
     </TouchableWithoutFeedback>
   );
 };
-
-export default RegistrationScreen;
-
-const width = Dimensions.get("window").width;
 
 const styles = StyleSheet.create({
   contentContainer: {
@@ -133,13 +244,11 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "flex-end",
     alignItems: "center",
-    width: width,
+    width: Dimensions.get("window").width,
   },
   formContainer: {
-    width: width,
-    alignItems: "center",
-    paddingTop: 32,
-    paddingBottom: 111,
+    paddingTop: 92,
+    paddingBottom: 45,
     paddingHorizontal: 16,
     backgroundColor: "#fff",
     borderTopLeftRadius: 25,
@@ -181,6 +290,7 @@ const styles = StyleSheet.create({
     bottom: 30,
     left: 255,
     color: "#1B4371",
+    fontFamily: "Roboto-Regular",
     fontSize: 16,
   },
   formBtn: {
@@ -191,21 +301,15 @@ const styles = StyleSheet.create({
     borderRadius: 100,
     marginBottom: 16,
   },
-  textBtn: { fontSize: 16, color: "#fff" },
+  textBtn: { fontFamily: "Roboto-Regular", fontSize: 16, color: "#fff" },
   footerContainer: {
     flexDirection: "row",
     justifyContent: "center",
   },
   footerText: {
-    textAlign: "center",
+    fontFamily: "Roboto-Regular",
     color: "#1B4371",
     fontSize: 16,
-  },
-  footerRegisterText: {
-    textAlign: "center",
-    color: "#1B4371",
-    fontSize: 16,
-    textDecorationLine: "underline",
   },
   avatar: {
     position: "absolute",
@@ -223,7 +327,6 @@ const styles = StyleSheet.create({
     top: 75,
     width: 25,
     height: 25,
-    zIndex: 2,
     backgroundColor: "#fff",
     borderRadius: 100,
     borderColor: "#FF6C00",
@@ -235,7 +338,6 @@ const styles = StyleSheet.create({
     left: 11,
     width: 1,
     height: 13,
-    zIndex: 3,
     backgroundColor: "#FF6C00",
   },
   addAvatarBtnHorizontalLine: {
@@ -244,7 +346,40 @@ const styles = StyleSheet.create({
     left: 5,
     height: 1,
     width: 13,
-    zIndex: 3,
     backgroundColor: "#FF6C00",
+  },
+  avatarImg: {
+    width: 120,
+    height: 120,
+    borderRadius: 16,
+  },
+  deleteAvatarBtnCircle: {
+    position: "absolute",
+    left: 108,
+    bottom: 25,
+    width: 25,
+    height: 25,
+    backgroundColor: "#fff",
+    borderRadius: 100,
+    borderColor: "#BDBDBD",
+    borderWidth: 1,
+  },
+  deleteAvatarBtnVerticalLine: {
+    position: "absolute",
+    top: 5,
+    left: 11,
+    width: 1,
+    height: 13,
+    transform: [{ rotate: "135deg" }],
+    backgroundColor: "#BDBDBD",
+  },
+  deleteAvatarBtnHorizontalLine: {
+    position: "absolute",
+    top: 11,
+    left: 5,
+    height: 1,
+    width: 13,
+    transform: [{ rotate: "135deg" }],
+    backgroundColor: "#BDBDBD",
   },
 });
