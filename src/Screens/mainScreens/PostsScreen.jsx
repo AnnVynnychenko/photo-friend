@@ -1,5 +1,5 @@
 //react
-import React, { useEffect, useState } from "react";
+import React from "react";
 //react-native
 import {
   View,
@@ -7,7 +7,6 @@ import {
   Text,
   Image,
   TouchableOpacity,
-  FlatList,
   ScrollView,
 } from "react-native";
 import uuid from "react-native-uuid";
@@ -24,13 +23,10 @@ import {
   getLogin,
 } from "../../redux/auth/selectors.js";
 import { getPosts } from "../../redux/posts/selectors.js";
-import { getDataFromFirestore } from "../../firebase/service.js";
 
 export const PostsScreen = () => {
-  //const [posts, setPosts] = useState();
   const navigation = useNavigation();
   const posts = useSelector(getPosts);
-  console.log("postsPosts", posts);
   const avatarImg = useSelector(getAvatarImg);
   const login = useSelector(getLogin);
   const email = useSelector(getEmail);

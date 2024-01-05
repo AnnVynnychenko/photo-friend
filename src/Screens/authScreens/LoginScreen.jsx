@@ -71,7 +71,6 @@ export const LoginScreen = () => {
         );
         dispatch(setAvatar({ avatarImg: user.photoURL }));
         const posts = await getDataFromFirestore();
-        console.log("postsLogin", posts);
         if (posts) {
           dispatch(addPost({ posts }));
         }

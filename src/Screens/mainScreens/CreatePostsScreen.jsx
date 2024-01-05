@@ -11,7 +11,6 @@ import {
   TouchableWithoutFeedback,
   View,
 } from "react-native";
-import uuid from "react-native-uuid";
 //icon
 import { FontAwesome5, SimpleLineIcons } from "@expo/vector-icons";
 import Feather from "react-native-vector-icons/Feather";
@@ -22,12 +21,10 @@ import { Camera } from "expo-camera";
 import * as MediaLibrary from "expo-media-library";
 import * as Location from "expo-location";
 //redux
-import { useDispatch } from "react-redux";
-import { addPost } from "../../redux/posts/postsSlice";
+import { useDispatch, useSelector } from "react-redux";
 //firebase
-import { collection, addDoc } from "firebase/firestore";
-import { db } from "../../firebase/firebaseConfig";
 import { writeDataToFirestore } from "../../firebase/service";
+import { getPosts } from "../../redux/posts/selectors";
 
 export const CreatePostsScreen = () => {
   const [photoName, setPhotoName] = useState("");
@@ -42,6 +39,8 @@ export const CreatePostsScreen = () => {
   const navigation = useNavigation();
 
   const dispatch = useDispatch();
+
+  const posts = useSelector(getPosts);
 
   useEffect(() => {
     (async () => {
@@ -77,7 +76,6 @@ export const CreatePostsScreen = () => {
 
   const handlePublish = () => {
     const newPost = {
-      id: uuid.v4(),
       photoName,
       location: currentLocation,
       capturedImage,
@@ -86,7 +84,7 @@ export const CreatePostsScreen = () => {
       likes: 0,
       commentCount: 0,
     };
-    writeDataToFirestore(newPost);
+    writeDataToFirestore(dispatch, newPost, posts);
     navigation.navigate("Home", {
       screen: "Posts",
     });

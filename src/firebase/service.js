@@ -4,7 +4,14 @@ import {
 } from "firebase/auth";
 import { auth, db, storage } from "./firebaseConfig";
 import { getDownloadURL, ref, uploadBytes } from "firebase/storage";
-import { addDoc, collection, getDocs } from "firebase/firestore";
+import {
+  addDoc,
+  collection,
+  doc,
+  getDocs,
+  updateDoc,
+} from "firebase/firestore";
+import { addPost } from "../redux/posts/postsSlice";
 
 export const registerDB = async ({ email, password }) => {
   try {
@@ -64,7 +71,7 @@ export const uploadAvatarToServer = async ({ uri, mimeType }) => {
   }
 };
 
-export const writeDataToFirestore = async (newPost) => {
+export const writeDataToFirestore = async (dispatch, newPost, posts) => {
   try {
     const user = auth.currentUser;
     if (!user) {
@@ -77,6 +84,8 @@ export const writeDataToFirestore = async (newPost) => {
       newPost
     );
     console.log("Document written with ID: ", docRef.id);
+
+    dispatch(addPost({ posts: [...posts, { id: docRef.id, data: newPost }] }));
   } catch (error) {
     console.error("Error adding document: ", error);
     throw error;
@@ -92,5 +101,18 @@ export const getDataFromFirestore = async () => {
   } catch (error) {
     console.log(error);
     throw error;
+  }
+};
+
+export const updateDataInFirestore = async (postId, currentLikes) => {
+  try {
+    const user = auth.currentUser;
+    const ref = doc(db, `users/${user.uid}/posts`, postId);
+    await updateDoc(ref, {
+      likes: currentLikes === 0 ? 1 : 0,
+    });
+    console.log("document updated");
+  } catch (error) {
+    console.log(error);
   }
 };

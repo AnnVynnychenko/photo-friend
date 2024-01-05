@@ -1,7 +1,7 @@
 //react
 import React from "react";
 //react-native
-import { Dimensions, FlatList } from "react-native";
+import { Dimensions, ScrollView } from "react-native";
 import {
   ImageBackground,
   View,
@@ -23,15 +23,16 @@ import { clearAvatarImg, setAvatar } from "../../redux/auth/authSlice";
 import { getPosts } from "../../redux/posts/selectors";
 //navigation
 import { useNavigation } from "@react-navigation/native";
-import { uploadAvatarToServer } from "../../firebase/service";
+import {
+  updateDataInFirestore,
+  uploadAvatarToServer,
+} from "../../firebase/service";
 import { updateProfile } from "firebase/auth";
 import { auth } from "../../firebase/firebaseConfig";
 
 export const ProfileScreen = () => {
   const dispatch = useDispatch();
-
   const navigation = useNavigation();
-
   const avatarImg = useSelector(getAvatarImg);
   const posts = useSelector(getPosts);
   const login = useSelector(getLogin);
@@ -73,8 +74,9 @@ export const ProfileScreen = () => {
     }
   };
 
-  const handleIncrementLike = (postId) => {
+  const handleIncrementLike = (postId, currentLikes) => {
     dispatch(incrementLike({ postId }));
+    updateDataInFirestore(postId, currentLikes);
   };
 
   return (
@@ -107,129 +109,139 @@ export const ProfileScreen = () => {
               )}
             </View>
             <Text style={styles.title}>{login}</Text>
-            {posts && (
-              <FlatList
-                data={posts}
-                keyExtractor={(item) => item.id}
-                renderItem={({ item: post }) => (
-                  <View style={styles.postContainer}>
-                    <View style={styles.photoContainer}>
-                      <Image
-                        source={{ uri: post.capturedImage }}
-                        style={styles.capturedImage}
-                      />
-                    </View>
-                    <Text style={styles.photoName}>{post.photoName}</Text>
-                    <View style={styles.additionalInfoContainer}>
-                      <View style={styles.commentAndLikeContainer}>
-                        {post.commentCount === 0 ? (
-                          <View style={styles.commonContainer}>
-                            <TouchableOpacity
-                              onPress={() => {
-                                navigation.navigate("Comments", {
-                                  postId: post.id,
-                                  post: post,
-                                });
-                              }}
-                            >
-                              <Feather
-                                name="message-circle"
-                                size={24}
-                                color="#BDBDBD"
-                                style={styles.commentIcon}
-                              />
-                            </TouchableOpacity>
-                            <Text style={styles.quantity}>
-                              {post.commentCount}
-                            </Text>
-                          </View>
-                        ) : (
-                          <View style={styles.commonContainer}>
-                            <TouchableOpacity
-                              onPress={() => {
-                                navigation.navigate("Comments", {
-                                  postId: post.id,
-                                  post: post,
-                                });
-                              }}
-                            >
-                              <Feather
-                                name="message-circle"
-                                size={24}
-                                color="#FF6C00"
-                                style={styles.commentIcon}
-                              />
-                            </TouchableOpacity>
-                            <Text
-                              style={[styles.quantity, styles.quantityActive]}
-                            >
-                              {post.commentCount}
-                            </Text>
-                          </View>
-                        )}
-                        {post.likes === 0 ? (
-                          <View style={styles.commonContainer}>
-                            <TouchableOpacity
-                              onPress={() => handleIncrementLike(post.id)}
-                            >
-                              <Feather
-                                name="thumbs-up"
-                                size={24}
-                                color="#BDBDBD"
-                              />
-                            </TouchableOpacity>
-                            <Text style={styles.quantity}>{post.likes}</Text>
-                          </View>
-                        ) : (
-                          <View style={styles.commonContainer}>
-                            <TouchableOpacity
-                              onPress={() => handleIncrementLike(post.id)}
-                            >
-                              <Feather
-                                name="thumbs-up"
-                                size={24}
-                                color="#FF6C00"
-                              />
-                            </TouchableOpacity>
-                            <Text
-                              style={[styles.quantity, styles.quantityActive]}
-                            >
-                              {post.likes}
-                            </Text>
-                          </View>
-                        )}
+            <ScrollView>
+              {posts &&
+                posts.map(({ id, data }) => {
+                  if (!data) {
+                    return null;
+                  }
+                  const {
+                    capturedImage,
+                    photoName,
+                    commentCount,
+                    likes,
+                    location,
+                    userLocation,
+                  } = data;
+                  return (
+                    <View style={styles.postContainer} key={id}>
+                      <View style={styles.photoContainer}>
+                        <Image
+                          source={{ uri: capturedImage }}
+                          style={styles.capturedImage}
+                        />
                       </View>
-                      <View style={styles.locationContainer}>
-                        {post.location ? (
-                          <TouchableOpacity
-                            onPress={() =>
-                              navigation.navigate("Map", {
-                                location: post.location,
-                              })
-                            }
-                          >
+                      <Text style={styles.photoName}>{photoName}</Text>
+                      <View style={styles.additionalInfoContainer}>
+                        <View style={styles.commentAndLikeContainer}>
+                          {commentCount === 0 ? (
+                            <View style={styles.commonContainer}>
+                              <TouchableOpacity
+                                onPress={() => {
+                                  navigation.navigate("Comments", {
+                                    postId: id,
+                                    post: data,
+                                  });
+                                }}
+                              >
+                                <Feather
+                                  name="message-circle"
+                                  size={24}
+                                  color="#BDBDBD"
+                                  style={styles.commentIcon}
+                                />
+                              </TouchableOpacity>
+                              <Text style={styles.quantity}>
+                                {commentCount}
+                              </Text>
+                            </View>
+                          ) : (
+                            <View style={styles.commonContainer}>
+                              <TouchableOpacity
+                                onPress={() => {
+                                  navigation.navigate("Comments", {
+                                    postId: id,
+                                    post: data,
+                                  });
+                                }}
+                              >
+                                <Feather
+                                  name="message-circle"
+                                  size={24}
+                                  color="#FF6C00"
+                                  style={styles.commentIcon}
+                                />
+                              </TouchableOpacity>
+                              <Text
+                                style={[styles.quantity, styles.quantityActive]}
+                              >
+                                {commentCount}
+                              </Text>
+                            </View>
+                          )}
+                          {likes === 0 ? (
+                            <View style={styles.commonContainer}>
+                              <TouchableOpacity
+                                onPress={() => handleIncrementLike(id, likes)}
+                              >
+                                <Feather
+                                  name="thumbs-up"
+                                  size={24}
+                                  color="#BDBDBD"
+                                />
+                              </TouchableOpacity>
+                              <Text style={styles.quantity}>{likes}</Text>
+                            </View>
+                          ) : (
+                            <View style={styles.commonContainer}>
+                              <TouchableOpacity
+                                onPress={() => handleIncrementLike(id, likes)}
+                              >
+                                <Feather
+                                  name="thumbs-up"
+                                  size={24}
+                                  color="#FF6C00"
+                                />
+                              </TouchableOpacity>
+                              <Text
+                                style={[styles.quantity, styles.quantityActive]}
+                              >
+                                {likes}
+                              </Text>
+                            </View>
+                          )}
+                        </View>
+                        <View style={styles.locationContainer}>
+                          {location ? (
+                            <TouchableOpacity
+                              onPress={() =>
+                                navigation.navigate("Map", {
+                                  location,
+                                })
+                              }
+                            >
+                              <SimpleLineIcons
+                                name="location-pin"
+                                size={24}
+                                color="#FF6C00"
+                              />
+                            </TouchableOpacity>
+                          ) : (
                             <SimpleLineIcons
                               name="location-pin"
                               size={24}
-                              color="#FF6C00"
+                              color="#BDBDBD"
                             />
-                          </TouchableOpacity>
-                        ) : (
-                          <SimpleLineIcons
-                            name="location-pin"
-                            size={24}
-                            color="#BDBDBD"
-                          />
-                        )}
-                        <Text style={styles.locationText}>
-                          {post.userLocation}
-                        </Text>
+                          )}
+                          <Text style={styles.locationText}>
+                            {userLocation}
+                          </Text>
+                        </View>
                       </View>
                     </View>
-                  </View>
-                )}
-              />
-            )}
+                  );
+                })}
+            </ScrollView>
           </View>
         </View>
       </ImageBackground>
