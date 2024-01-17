@@ -28,6 +28,8 @@ import { getCommentsForPost } from "../../redux/posts/selectors";
 //date
 import moment from "moment";
 import "moment/locale/uk";
+import { ScrollView } from "react-native-gesture-handler";
+import { updateCommentsInFirestore } from "../../firebase/service";
 
 export const CommentsScreen = ({ route }) => {
   const { postId, post } = route.params;
@@ -48,6 +50,7 @@ export const CommentsScreen = ({ route }) => {
     if (newComment.commentText) {
       dispatch(addComment({ postId, newComment }));
       dispatch(incrementCommentCounter({ postId }));
+      updateCommentsInFirestore(postId, newComment);
     }
     setComment("");
   };
@@ -75,6 +78,10 @@ export const CommentsScreen = ({ route }) => {
             style={styles.capturedImage}
           />
         </View>
+
+        {/* <ScrollView>
+
+        </ScrollView> */}
 
         <FlatList
           style={styles.commentsScroll}

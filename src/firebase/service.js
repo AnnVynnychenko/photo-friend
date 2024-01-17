@@ -8,6 +8,7 @@ import {
   addDoc,
   collection,
   doc,
+  getDoc,
   getDocs,
   updateDoc,
 } from "firebase/firestore";
@@ -104,15 +105,41 @@ export const getDataFromFirestore = async () => {
   }
 };
 
-export const updateDataInFirestore = async (postId, currentLikes) => {
+export const updateLikesInFirestore = async (postId, currentLikes) => {
   try {
     const user = auth.currentUser;
     const ref = doc(db, `users/${user.uid}/posts`, postId);
+
     await updateDoc(ref, {
       likes: currentLikes === 0 ? 1 : 0,
     });
     console.log("document updated");
   } catch (error) {
     console.log(error);
+  }
+};
+
+export const updateCommentsInFirestore = async (postId, newComment) => {
+  try {
+    const user = auth.currentUser;
+
+    const postRef = doc(db, `users/${user.uid}/posts`, postId);
+    const postDoc = await getDoc(postRef);
+
+    if (postDoc.exists()) {
+      const existingComments = postDoc.data().comments || [];
+      const updatedComments = [...existingComments, newComment];
+
+      await updateDoc(postRef, {
+        comments: updatedComments,
+        commentCount: updatedComments.length,
+      });
+
+      console.log("Document updated with new comment");
+    } else {
+      console.log("Post document not found");
+    }
+  } catch (error) {
+    console.error("Error updating comments in Firestore", error);
   }
 };

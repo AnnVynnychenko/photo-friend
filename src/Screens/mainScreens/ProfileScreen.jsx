@@ -24,7 +24,7 @@ import { getPosts } from "../../redux/posts/selectors";
 //navigation
 import { useNavigation } from "@react-navigation/native";
 import {
-  updateDataInFirestore,
+  updateLikesInFirestore,
   uploadAvatarToServer,
 } from "../../firebase/service";
 import { updateProfile } from "firebase/auth";
@@ -35,6 +35,7 @@ export const ProfileScreen = () => {
   const navigation = useNavigation();
   const avatarImg = useSelector(getAvatarImg);
   const posts = useSelector(getPosts);
+  console.log("posts", posts);
   const login = useSelector(getLogin);
 
   const user = auth.currentUser;
@@ -76,7 +77,7 @@ export const ProfileScreen = () => {
 
   const handleIncrementLike = (postId, currentLikes) => {
     dispatch(incrementLike({ postId }));
-    updateDataInFirestore(postId, currentLikes);
+    updateLikesInFirestore(postId, currentLikes);
   };
 
   return (

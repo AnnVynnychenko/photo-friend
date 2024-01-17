@@ -15,9 +15,10 @@ const postsSlice = createSlice({
     addComment: (state, action) => {
       const { postId, newComment } = action.payload;
       const postIndex = state.posts.findIndex((post) => post.id === postId);
+
       if (postIndex !== -1) {
-        state.posts[postIndex].comments = [
-          ...state.posts[postIndex].comments,
+        state.posts[postIndex].data.comments = [
+          ...state.posts[postIndex].data.comments,
           newComment,
         ];
       }
@@ -25,7 +26,6 @@ const postsSlice = createSlice({
     incrementLike: (state, action) => {
       const { postId } = action.payload;
       const postIndex = state.posts.findIndex((post) => post.id === postId);
-      console.log("postIndex", postIndex);
       if (postIndex !== -1) {
         state.posts[postIndex].data.likes =
           state.posts[postIndex].data.likes === 0 ? 1 : 0;
@@ -35,8 +35,8 @@ const postsSlice = createSlice({
       const { postId } = action.payload;
       const postIndex = state.posts.findIndex((post) => post.id === postId);
       if (postIndex !== -1) {
-        state.posts[postIndex].commentCount =
-          state.posts[postIndex].comments.length;
+        state.posts[postIndex].data.commentCount =
+          state.posts[postIndex].data.comments.length;
       }
     },
     signOutUser: () => initialState,
