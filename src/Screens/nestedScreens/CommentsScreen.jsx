@@ -43,10 +43,15 @@ export const CommentsScreen = ({ route }) => {
   const userComments = useSelector((state) =>
     getCommentsForPost(state, postId)
   );
+  console.log("userComments", userComments);
 
   const handleAddComment = () => {
     const currentDate = moment().locale("uk").format("DD MMMM, YYYY | HH:mm");
-    const newComment = { commentText: comment, date: currentDate };
+    const newComment = {
+      commentText: comment,
+      date: currentDate,
+      id: uuid.v4(),
+    };
     if (newComment.commentText) {
       dispatch(addComment({ postId, newComment }));
       dispatch(incrementCommentCounter({ postId }));
@@ -79,30 +84,28 @@ export const CommentsScreen = ({ route }) => {
           />
         </View>
 
-        {/* <ScrollView>
-
-        </ScrollView> */}
-
-        <FlatList
-          style={styles.commentsScroll}
-          data={userComments}
-          keyExtractor={() => uuid.v4()}
-          renderItem={({ item: userComment }) => {
-            return (
-              <View style={styles.userCommentContainer}>
-                <View style={styles.commentContainer}>
-                  <Text style={styles.commentText}>
-                    {userComment.commentText}
-                  </Text>
-                  <Text style={styles.commentData}>{userComment.date}</Text>
+        <ScrollView>
+          {userComments &&
+            userComments.map(({ commentText, date, id }) => {
+              if (!commentText) {
+                return null;
+              }
+              return (
+                <View style={styles.userCommentContainer} key={id}>
+                  <View style={styles.commentContainer}>
+                    <Text style={styles.commentText}>{commentText}</Text>
+                    <Text style={styles.commentData}>{date}</Text>
+                  </View>
+                  <View style={styles.avatarContainer}>
+                    <Image
+                      source={{ uri: avatarImg }}
+                      style={styles.avatarImg}
+                    />
+                  </View>
                 </View>
-                <View style={styles.avatarContainer}>
-                  <Image source={{ uri: avatarImg }} style={styles.avatarImg} />
-                </View>
-              </View>
-            );
-          }}
-        />
+              );
+            })}
+        </ScrollView>
         <View>
           <TextInput
             style={
