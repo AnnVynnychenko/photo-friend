@@ -7,6 +7,7 @@ import { getDownloadURL, ref, uploadBytes } from "firebase/storage";
 import {
   addDoc,
   collection,
+  deleteDoc,
   doc,
   getDoc,
   getDocs,
@@ -154,4 +155,16 @@ export const updatePostInFirestore = async (id, imageName, locationText) => {
       userLocation: locationText,
     });
   } catch (error) {}
+};
+
+export const deletePostFromFirestore = async (id) => {
+  try {
+    const user = auth.currentUser;
+
+    const postRef = doc(db, `users/${user.uid}/posts`, id);
+    await deleteDoc(postRef);
+    console.log("Document deleted successfully");
+  } catch (error) {
+    console.error("Error deleting document: ", error);
+  }
 };

@@ -17,11 +17,13 @@ import Feather from "react-native-vector-icons/Feather";
 //navigation
 import { useNavigation } from "@react-navigation/native";
 //redux
-import { useDispatch, useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
+import { deletePost, editPost } from "../../redux/posts/postsSlice";
 //firebase
-import { getPosts } from "../../redux/posts/selectors";
-import { editPost } from "../../redux/posts/postsSlice";
-import { updatePostInFirestore } from "../../firebase/service";
+import {
+  deletePostFromFirestore,
+  updatePostInFirestore,
+} from "../../firebase/service";
 
 export const SelectedPostScreen = ({ route }) => {
   const { capturedImage, photoName, userLocation, location, id } = route.params;
@@ -40,6 +42,12 @@ export const SelectedPostScreen = ({ route }) => {
       })
     );
     updatePostInFirestore(id, imageName, locationText);
+    navigation.goBack();
+  };
+
+  const handleDeletePost = () => {
+    dispatch(deletePost({ postId: id }));
+    deletePostFromFirestore(id);
     navigation.goBack();
   };
 
@@ -107,8 +115,11 @@ export const SelectedPostScreen = ({ route }) => {
             </Text>
           </TouchableOpacity>
         )}
-        <TouchableOpacity style={styles.deletePhotoCircle}>
-          <Feather name="trash-2" size={24} color="#BDBDBD" />
+        <TouchableOpacity
+          onPress={handleDeletePost}
+          style={styles.deletePhotoCircle}
+        >
+          <Feather name="trash-2" size={24} color="#fff" />
         </TouchableOpacity>
       </View>
     </TouchableWithoutFeedback>
@@ -191,7 +202,7 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     width: 70,
     height: 40,
-    backgroundColor: "#F6F6F6",
+    backgroundColor: "#FF6C00",
   },
   cameraContainer: {
     width: 343,

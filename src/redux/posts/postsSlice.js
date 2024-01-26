@@ -50,6 +50,10 @@ const postsSlice = createSlice({
         state.posts[postIndex].data.userLocation = newLocation;
       }
     },
+    deletePost: (state, action) => {
+      const { postId } = action.payload;
+      state.posts = state.posts.filter((post) => post.id !== postId);
+    },
   },
 });
 
@@ -60,5 +64,6 @@ export const {
   incrementCommentCounter,
   signOutUser,
   editPost,
+  deletePost,
 } = postsSlice.actions;
 export default postsReducer = postsSlice.reducer;
