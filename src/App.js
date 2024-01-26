@@ -10,7 +10,8 @@ import { LoginScreen } from "./Screens/authScreens/LoginScreen";
 import { HomeScreen } from "./Screens/mainScreens/HomeScreen";
 import { MapScreen } from "./Screens/nestedScreens/MapScreen";
 import { CommentsScreen } from "./Screens/nestedScreens/CommentsScreen";
-import { HeaderCommentsScreen } from "./components/HeaderCommentsScreen";
+import { HeaderComments } from "./components/HeaderComments";
+import { SelectedPostScreen } from "./Screens/nestedScreens/SelectedPostScreen";
 //navigation
 import { NavigationContainer } from "@react-navigation/native";
 import { createStackNavigator } from "@react-navigation/stack";
@@ -18,6 +19,7 @@ import { createStackNavigator } from "@react-navigation/stack";
 import { PersistGate } from "redux-persist/integration/react";
 import { Provider } from "react-redux";
 import store from "./redux/store";
+import { HeaderSelectedPost } from "./components/HeaderSelectedPost";
 
 const MainStack = createStackNavigator();
 
@@ -63,7 +65,20 @@ export default function App() {
               name="Comments"
               component={CommentsScreen}
               options={{
-                headerTitle: (props) => <HeaderCommentsScreen {...props} />,
+                headerTitle: (props) => <HeaderComments {...props} />,
+                headerStyle: {
+                  backgroundColor: "#fff",
+                  borderBottomColor: "rgba(0, 0, 0, 0.3)",
+                  borderBottomWidth: 1,
+                },
+                headerLeft: null,
+              }}
+            />
+            <MainStack.Screen
+              name="SelectedPost"
+              component={SelectedPostScreen}
+              options={{
+                headerTitle: (props) => <HeaderSelectedPost {...props} />,
                 headerStyle: {
                   backgroundColor: "#fff",
                   borderBottomColor: "rgba(0, 0, 0, 0.3)",

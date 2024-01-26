@@ -43,7 +43,6 @@ export const CommentsScreen = ({ route }) => {
   const userComments = useSelector((state) =>
     getCommentsForPost(state, postId)
   );
-  console.log("userComments", userComments);
 
   const handleAddComment = () => {
     const currentDate = moment().locale("uk").format("DD MMMM, YYYY | HH:mm");

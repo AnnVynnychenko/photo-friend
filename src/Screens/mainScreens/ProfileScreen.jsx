@@ -126,12 +126,24 @@ export const ProfileScreen = () => {
                   } = data;
                   return (
                     <View style={styles.postContainer} key={id}>
-                      <View style={styles.photoContainer}>
-                        <Image
-                          source={{ uri: capturedImage }}
-                          style={styles.capturedImage}
-                        />
-                      </View>
+                      <TouchableOpacity
+                        onPress={() =>
+                          navigation.navigate("SelectedPost", {
+                            capturedImage,
+                            photoName,
+                            userLocation,
+                            location,
+                            id,
+                          })
+                        }
+                      >
+                        <View style={styles.photoContainer}>
+                          <Image
+                            source={{ uri: capturedImage }}
+                            style={styles.capturedImage}
+                          />
+                        </View>
+                      </TouchableOpacity>
                       <Text style={styles.photoName}>{photoName}</Text>
                       <View style={styles.additionalInfoContainer}>
                         <View style={styles.commentAndLikeContainer}>

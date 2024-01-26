@@ -108,9 +108,9 @@ export const getDataFromFirestore = async () => {
 export const updateLikesInFirestore = async (postId, currentLikes) => {
   try {
     const user = auth.currentUser;
-    const ref = doc(db, `users/${user.uid}/posts`, postId);
+    const postRef = doc(db, `users/${user.uid}/posts`, postId);
 
-    await updateDoc(ref, {
+    await updateDoc(postRef, {
       likes: currentLikes === 0 ? 1 : 0,
     });
     console.log("document updated");
@@ -142,4 +142,16 @@ export const updateCommentsInFirestore = async (postId, newComment) => {
   } catch (error) {
     console.error("Error updating comments in Firestore", error);
   }
+};
+
+export const updatePostInFirestore = async (id, imageName, locationText) => {
+  try {
+    const user = auth.currentUser;
+
+    const postRef = doc(db, `users/${user.uid}/posts`, id);
+    await updateDoc(postRef, {
+      photoName: imageName,
+      userLocation: locationText,
+    });
+  } catch (error) {}
 };

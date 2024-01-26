@@ -9,7 +9,6 @@ import {
   TouchableOpacity,
   ScrollView,
 } from "react-native";
-import uuid from "react-native-uuid";
 //navigation
 import { useNavigation } from "@react-navigation/native";
 //icon
@@ -51,19 +50,30 @@ export const PostsScreen = () => {
             const {
               capturedImage,
               commentCount,
-              comments,
               photoName,
               location,
               userLocation,
             } = data;
             return (
               <View style={styles.postContainer} key={id}>
-                <View style={styles.photoContainer}>
-                  <Image
-                    source={{ uri: capturedImage }}
-                    style={styles.capturedImage}
-                  />
-                </View>
+                <TouchableOpacity
+                  onPress={() =>
+                    navigation.navigate("SelectedPost", {
+                      capturedImage,
+                      photoName,
+                      userLocation,
+                      location,
+                      id,
+                    })
+                  }
+                >
+                  <View style={styles.photoContainer}>
+                    <Image
+                      source={{ uri: capturedImage }}
+                      style={styles.capturedImage}
+                    />
+                  </View>
+                </TouchableOpacity>
                 <Text style={styles.photoName}>{photoName}</Text>
                 <View style={styles.additionalInfoContainer}>
                   {commentCount === 0 ? (

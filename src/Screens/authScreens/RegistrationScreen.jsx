@@ -20,12 +20,14 @@ import * as ImagePicker from "expo-image-picker";
 //navigation
 import { useNavigation } from "@react-navigation/native";
 //redux
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { setUserData, setAvatar } from "../../redux/auth/authSlice";
 //firebase
 import { updateProfile } from "firebase/auth";
 import { auth } from "../../firebase/firebaseConfig";
 import { registerDB, uploadAvatarToServer } from "../../firebase/service";
+import { getPosts } from "../../redux/posts/selectors";
+import { signOutUser } from "../../redux/posts/postsSlice";
 
 export const RegistrationScreen = () => {
   const [inputFocusState, setInputFocusState] = useState({
@@ -38,6 +40,7 @@ export const RegistrationScreen = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [avatarImg, setAvatarImg] = useState(null);
+  const posts = useSelector(getPosts);
 
   const navigation = useNavigation();
 
@@ -95,12 +98,17 @@ export const RegistrationScreen = () => {
       const trimmedLogin = login.trim();
       await registerDB({ email: trimmedEmail, password: trimmedPassword });
       const user = auth.currentUser;
-
+      if (posts) {
+        dispatch(signOutUser());
+      }
       if (user !== null) {
-        const photoLink = await uploadAvatarToServer({
-          uri: avatarImg,
-          mimeType: avatarImg.split(".").pop(),
-        });
+        let photoLink;
+        if (user.photoURL !== null) {
+          photoLink = await uploadAvatarToServer({
+            uri: avatarImg,
+            mimeType: avatarImg.split(".").pop(),
+          });
+        }
         await updateProfile(user, {
           displayName: trimmedLogin,
           photoURL: photoLink,

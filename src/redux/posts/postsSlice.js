@@ -39,7 +39,17 @@ const postsSlice = createSlice({
           state.posts[postIndex].data.comments.length;
       }
     },
-    signOutUser: () => initialState,
+    signOutUser: (state) => {
+      state.posts = [];
+    },
+    editPost: (state, action) => {
+      const { postId, newPhotoName, newLocation } = action.payload;
+      const postIndex = state.posts.findIndex((post) => post.id === postId);
+      if (postIndex !== -1) {
+        state.posts[postIndex].data.photoName = newPhotoName;
+        state.posts[postIndex].data.userLocation = newLocation;
+      }
+    },
   },
 });
 
@@ -49,5 +59,6 @@ export const {
   incrementLike,
   incrementCommentCounter,
   signOutUser,
+  editPost,
 } = postsSlice.actions;
 export default postsReducer = postsSlice.reducer;
