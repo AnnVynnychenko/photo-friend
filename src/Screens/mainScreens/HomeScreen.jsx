@@ -68,7 +68,8 @@ const tabBarOption = ({ route }) => ({
     shadowRadius: 0,
   },
 });
-export const HomeScreen = ({ navigation }) => {
+export const HomeScreen = ({ navigation, route }) => {
+  console.log("route", route);
   const navigationToPage = useNavigation();
   const dispatch = useDispatch();
   const handleLogOut = async () => {
@@ -119,7 +120,10 @@ export const HomeScreen = ({ navigation }) => {
           headerLeft: () => (
             <TouchableOpacity
               style={{ marginLeft: 16 }}
-              onPress={() => navigation.goBack()}
+              onPress={() => {
+                navigation.navigate("Posts");
+                console.log(route.params);
+              }}
             >
               <Feather
                 name="arrow-left"
