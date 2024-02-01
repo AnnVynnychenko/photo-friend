@@ -1,5 +1,3 @@
-//react
-import React from "react";
 //react-native
 import { Dimensions, ScrollView } from "react-native";
 import {

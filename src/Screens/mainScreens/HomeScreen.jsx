@@ -1,5 +1,3 @@
-//react
-import React from "react";
 //react-native
 import { Text, TouchableOpacity } from "react-native";
 //navigation
